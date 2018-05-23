@@ -1,0 +1,24 @@
+{
+  "name": "openweather",
+  "version": "1.0.0",
+  "description": "A group of modules for interacting with varioius OpenWeather API's",
+  "main": "openweather.js",
+  "scripts": {
+    "doc": "jsdoc src -r -d ./docs -R README.md -P package.json",
+    "lint": "eslint src",
+    "clean": "rm -rdf node_modules/ docs/ npm-debug.log",
+    "test": "mocha"
+  },
+  "author": "laguirre",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^5.0.1",
+    "got": "^8.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "jsdoc": "^3.5.5",
+    "mocha": "^5.2.0",
+    "nock": "^9.2.6"
+  }
+}
