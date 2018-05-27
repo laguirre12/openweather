@@ -4,21 +4,31 @@
   "description": "A group of modules for interacting with varioius OpenWeather API's",
   "main": "openweather.js",
   "scripts": {
-    "doc": "jsdoc src -r -d ./docs -R README.md -P package.json",
+    "doc": "jsdoc src --configure .jsdoc.json --verbose",
     "lint": "eslint src",
     "clean": "rm -rdf node_modules/ docs/ npm-debug.log",
     "test": "mocha"
   },
   "author": "laguirre",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^5.0.1",
     "got": "^8.3.1"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
+    "eslint-plugin-jsdoc": "^3.7.0",
     "jsdoc": "^3.5.5",
+    "minami": "^1.2.3",
     "mocha": "^5.2.0",
     "nock": "^9.2.6"
+  },
+  "keywords": [
+    "Weather",
+    "OpenWeather"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laguirre12/openweather.git"
   }
 }

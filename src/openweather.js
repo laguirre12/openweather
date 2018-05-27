@@ -14,7 +14,7 @@ let APPID; // global references to API_KEY
 /**
  * Sets and retrieves the global (default) API key to use for all requests.
  * @param {string} appid Default API key
- * @return {string} The current default API KEY
+ * @returns {string} The current default API KEY
  */
 function defaultKey(appid) {
   if (arguments.length) {
@@ -43,6 +43,6 @@ module.exports = {
   sulfurDioxide: air.sulfurDioxide,
   carbonMonoxide: air.carbonMonoxide,
   nitrogenDioxide: air.nitrogenDioxide,
-  PollutionRequest: air.PollutionRequest,
-  PollutionRequestType: air.PollutionRequestType,
+  AirRequest: air.AirRequest,
+  AirRequestType: air.AirRequestType,
 };

@@ -1,7 +1,7 @@
 const url = require('url');
 const nock = require('nock');
 const assert = require('assert');
-const weather = require('../src/server/weather/openweather-weather');
+const weather = require('../src/openweather-weather');
 
 const source = nock('http://api.weathermap.org/data/2.5/')
   .get('/weather?')

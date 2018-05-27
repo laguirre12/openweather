@@ -1,6 +1,6 @@
 const url = require('url');
 const assert = require('assert');
-const air = require('../src/server/weather/openweather-air');
+const air = require('../src/openweather-air');
 
 /**
  * Given a url extracts the parameters of the url using the 'url' module.

@@ -10,6 +10,7 @@
  */
 
 const got = require('got');
+const InvalidRequestType = require('./InvalidRequest');
 
 let APPID; // global references to API_KEY
 
@@ -23,25 +24,31 @@ let APPID; // global references to API_KEY
  * @constant
  * @readonly
  * @enum {symbol(string)}
+ * @property {symbol(string)} O3 the ozone data endpoint ({@link https://openweathermap.org/api/pollution/o3})
+ * @property {symbol(string)} CO the carbon-monoxide data endpoint ({@link https://openweathermap.org/api/pollution/co})
+ * @property {symbol(string)} SO2 the sulfur-dioxide data endpoint ({@link https://openweathermap.org/api/pollution/so2})
+ * @property {symbol(string)} NO2 the nitrogen-dioxide data endpoint ({@link https://openweathermap.org/api/pollution/no2})
  */
-const PollutionRequestType = Object.freeze({
+const AirRequestType = Object.freeze({
   O3: Symbol('o3'),
   CO: Symbol('co'),
   SO2: Symbol('so2'),
   NO2: Symbol('no2'),
 
   /**
-   * Returns a string representation of the given PollutionRequestType.
-   * @param {PollutionRequestType} type the RequestType to get the name of
-   * @return {string} string value of the given PollutionRequestType
+   * Returns a string representation of the given AirRequestType.
+   * @param {AirRequestType} type the RequestType to get the name of
+   * @returns {string} string value of the given AirRequestType
+   * @throws {InvalidRequestType} if the given value is not a recognized
+   * AirRequestType
    */
   getName: function (type) {
     switch (type) {
-      case PollutionRequestType.O3: return 'ozone';
-      case PollutionRequestType.CO: return 'carbon-monoxide';
-      case PollutionRequestType.SO2: return 'sulfur-dioxide';
-      case PollutionRequestType.NO2: return 'nitrogen-dioxide';
-      default: throw 'unkown pollution type';
+      case AirRequestType.O3: return 'ozone';
+      case AirRequestType.CO: return 'carbon-monoxide';
+      case AirRequestType.SO2: return 'sulfur-dioxide';
+      case AirRequestType.NO2: return 'nitrogen-dioxide';
+      default: throw new InvalidRequestType('Unknown AirRequestType');
     }
   }
 });
@@ -62,10 +69,10 @@ const base = 'http://api.openweathermap.org/pollution/v1/';
  * @private
  */
 const BaseUrl = {};
-BaseUrl[PollutionRequestType.CO] = base + 'co';
-BaseUrl[PollutionRequestType.O3] = base + 'o3';
-BaseUrl[PollutionRequestType.CO2] = base + 'so2';
-BaseUrl[PollutionRequestType.NO2] = base + 'no2';
+BaseUrl[AirRequestType.CO] = base + 'co';
+BaseUrl[AirRequestType.O3] = base + 'o3';
+BaseUrl[AirRequestType.CO2] = base + 'so2';
+BaseUrl[AirRequestType.NO2] = base + 'no2';
 Object.freeze(BaseUrl);
 
 //--------------------------------------------------------------------
@@ -73,18 +80,30 @@ Object.freeze(BaseUrl);
 //--------------------------------------------------------------------
 
 /**
- * Represents an OpenWeather air pollution API call. Each PollutionRequest has
+ * Represents an OpenWeather air pollution API call. Each AirRequest has
  * a type and an associated URL that is constructed for the request. Parameters
  * for the request can be set using chainable methods that act as both getters
  * and setters for the given property.
+ * @example
+ * // creates a new AirRequest with no properties set
+ * const req = new AirRequest();
+ * @example
+ * // creates a new AirRequest with all properties used in the request
+ * const req = new AirRequest({
+ *   appid: 'API-KEY',
+ *   type: AirRequestType.O3,  // can be O3, CO, SO2, or NO2
+ *   lat: 100.113,                   // Requests to the Air pollution API must
+ *   lon: 55.166,                    //  use geo coordinates
+ *   datetime: (new Date())          // A Date Object for the request
+ * });
  */
-class PollutionRequest {
+class AirRequest {
   /**
-   * Constructs a PollutionRequest object, takes an optional configuration
-   * object to specify default properties of the request. PollutionRequest have
-   * are given a default API Key (set globally) and a default request Time of
-   * their creation time, unless otherwise specified.
-   * @param {object} [config] A configuration object for the request.
+   * Constructs a AirRequest object, takes an optional configuration
+   * object to specify default properties of the request. AirRequest have
+   * are given the default API Key (set globally) and a default datetime of the
+   * objects creation, unless otherwise specified.
+   * @param {Object} [config] A configuration object for the request
    */
   constructor(config) {
     if (config === null || typeof config!== 'object') {
@@ -98,14 +117,14 @@ class PollutionRequest {
   }
 
   /**
-   * Sets the API KEY for this PollutionRequest, if no parameters are passed
+   * Sets the API KEY for this AirRequest, if no parameters are passed
    * returns this requests API KEY. By default all PolutionRequests have the
    * global default APPID.
    * @param {string} [appid] The OpenWeather API key to use for this request.
-   * @return {PollutionRequest | string} The 'appid' string assigned to this
+   * @returns {AirRequest | string} The 'appid' string assigned to this
    * request if no parameters are passed. Otherwise 'this'.
    */
-  key(appid) {
+  appid(appid) {
     if (!arguments.length) return this.appid_;
     this.appid_ = appid;
     return this;
@@ -114,7 +133,7 @@ class PollutionRequest {
   /**
    * Constructs the url for the corresponding OpenWeather request using all
    * provided parameters.
-   * @return {string} The url that corresponds to the API request
+   * @returns {string} The url that corresponds to the API request
    */
   url() {
     const timeStr = this.datetime_.toISOString();
@@ -127,10 +146,10 @@ class PollutionRequest {
    * Given a RequestType, specifies which endpoint of the OpenWeather Air
    * Pollution API this request corresponds to. If no parameters are passed,
    * returns the assigned RequestType.
-   * @param {PollutionRequestType} [requestType] The type of this
-   * PollutionRequest
-   * @return {PollutionRequest | PollutionRequestType} The PollutionRequestType
-   * assigned to this request if no parameters are passed, otherwise this.
+   * @param {AirRequestType} [requestType] The type of this
+   * AirRequest
+   * @returns {AirRequest | AirRequestType} The AirRequestType
+   * assigned to this request if no parameters are passed, otherwise this
    */
   type(requestType) {
     if (!arguments.length) return this.type_;
@@ -141,10 +160,10 @@ class PollutionRequest {
   /**
    * Given a geo coordinates sets the location of the request. If no
    * parameters are passed, reports the assigned coordinates.
-   * @param {number} [lat] The latitude of the location.
-   * @param {number} [lon] The longitude of the location.
-   * @return {PollutionRequest | object} An object containing the lat and lon
-   * properties of the request if no parameters are passed, otherwise this.
+   * @param {number} [lat] The latitude of the location
+   * @param {number} [lon] The longitude of the location
+   * @returns {AirRequest | Object} An object containing the lat and lon
+   * properties of the request if no parameters are passed, otherwise this
    */
   coords(lat, lon) {
     if (!arguments.length) return { lat: this.lat_, lon: this.lon_ };
@@ -154,12 +173,12 @@ class PollutionRequest {
   }
 
   /**
-   * Given a Date object, sets the time for the PollutionRequest. If no
-   * arguments are passe, reports the assigned Date of this request. By default
-   * PollutionRequests have their create time as their default Datetime.
-   * @param {Date} [time] The time of the PollutionRequest.
-   * @return {PollutionRequest | Date} The Date of this PollutionRequest if no
-   * parameters are passed, otherwise this.
+   * Given a Date object, sets the time for the AirRequest. If no
+   * arguments are passed, reports the assigned Date. By default
+   * AirRequests have their create time as their default Datetime.
+   * @param {Date} [time] The time of the AirRequest
+   * @returns {AirRequest | Date} The Date of this AirRequest if no
+   * parameters are passed, otherwise this
    */
   datetime(time) {
     if (!arguments.length) return this.time_;
@@ -170,8 +189,8 @@ class PollutionRequest {
   /**
    * Executes the API request.
    * @param {function(err, res)} [callback] a callback function that is called
-   * with a possible error and the API response.
-   * @return {Promise} A promise representing the result of the request.
+   * with a possible error and the API response
+   * @returns {Promise} A promise representing the result of the request
    */
   exec(callback) {
     const url = this.url();
@@ -184,10 +203,17 @@ class PollutionRequest {
   }
 }
 
+
+//--------------------------------------------------------------------
+// Caching methods
+//--------------------------------------------------------------------
+
 /**
- * Add the response to the HTTP request to the cache.
- * @param {object} response response received from an HTTP request with got.
- * @return {object} response
+ * Adds the response to the HTTP request to the cache. Takes and returns the
+ * response received from the HTTP request.
+ * @param {Object} response the response of an API request
+ * @returns {Object} response
+ * @private
  */
 function addToCache(response) {
   // TODO(la): implement this (payload can be found in response.body)
@@ -201,7 +227,7 @@ function addToCache(response) {
 /**
  * Sets and retrieves the global (default) API key to use for requests.
  * @param {string} appid Default API key
- * @return {string} The current default API KEY
+ * @returns {string} The current default API KEY
  */
 function defaultKey(appid) {
   if (arguments.length) APPID = appid;
@@ -210,41 +236,41 @@ function defaultKey(appid) {
 
 
 /**
- * Returns a PollutionRequest for the OpenWeather Air Pollution ozone endpoint.
- * The PollutionRequest will have the 'O3' RequestType.
- * @return {PollutionRequest} A generic request for the ozone air pollution API
+ * Returns a AirRequest for the OpenWeather Air Pollution ozone endpoint.
+ * The AirRequest will have the 'O3' RequestType.
+ * @returns {AirRequest} A generic request for the ozone air pollution API
  */
 function ozone() {
-  return new PollutionRequest().type(PollutionRequestType.O3);
+  return new AirRequest().type(AirRequestType.O3);
 }
 
 /**
- * Returns a PollutionRequest for the OpenWeather Air Pollution carbon monoxide
- * endpoint. The PollutionRequest will have the 'CO' RequestType.
- * @return {PollutionRequest} A generic request for the 'CO' air pollution API
+ * Returns a AirRequest for the OpenWeather Air Pollution carbon monoxide
+ * endpoint. The AirRequest will have the 'CO' RequestType.
+ * @returns {AirRequest} A generic request for the 'CO' air pollution API
  */
 function carbonMonoxide() {
-  return new PollutionRequest().type(PollutionRequestType.CO);
+  return new AirRequest().type(AirRequestType.CO);
 }
 
 /**
- * Returns a new PollutionRequest for the OpenWeather Air Pollution
- * sulfur-dioxide endpoint. The PollutionRequest will have the 'SO2'
+ * Returns a new AirRequest for the OpenWeather Air Pollution
+ * sulfur-dioxide endpoint. The AirRequest will have the 'SO2'
  * RequestType.
- * @return {PollutionRequest} A generic request for the 'SO2' air pollution API
+ * @returns {AirRequest} A generic request for the 'SO2' air pollution API
  */
 function sulfurDioxide() {
-  return new PollutionRequest().type(PollutionRequestType.SO2);
+  return new AirRequest().type(AirRequestType.SO2);
 }
 
 /**
- * Returns a new PollutionRequest for the OpenWeather Air Pollution
- * nitrogen-dioxide endpoint. The PollutionRequest will have the 'NO2'
+ * Returns a new AirRequest for the OpenWeather Air Pollution
+ * nitrogen-dioxide endpoint. The AirRequest will have the 'NO2'
  * RequestType.
- * @return {PollutionRequest} A generic request for the 'NO2' air pollution API
+ * @returns {AirRequest} A generic request for the 'NO2' air pollution API
  */
 function nitrogenDioxide() {
-  return new PollutionRequest().type(PollutionRequestType.NO2);
+  return new AirRequest().type(AirRequestType.NO2);
 }
 
 
@@ -259,6 +285,6 @@ module.exports = {
   nitrogenDioxide: nitrogenDioxide,
   defaultKey: defaultKey,
 
-  PollutionRequest: PollutionRequest,
-  PollutionRequestType:PollutionRequestType,
+  AirRequest: AirRequest,
+  AirRequestType:AirRequestType,
 };

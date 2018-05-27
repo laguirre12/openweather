@@ -9,6 +9,7 @@
 
 const got = require('got');
 const url = require('url');
+const InvalidRequestType = require('./InvalidRequest');
 
 let APPID; // global references to API_KEY
 
@@ -22,6 +23,9 @@ let APPID; // global references to API_KEY
  * @constant
  * @readonly
  * @enum {symbol(string)}
+ * @property {symbol(string)} METRIC metric units
+ * @property {symbol(string)} STANDARD standard (kelvin) units
+ * @property {symbol(string)} IMPERIAL imperial units
  */
 const TemperatureUnit = Object.freeze({
   METRIC: Symbol('metric'),
@@ -31,14 +35,16 @@ const TemperatureUnit = Object.freeze({
   /**
    * Returns a string representation of the given TemperatureUnit.
    * @param {TemperatureUnit} unit the unit to get the name of
-   * @return {string} string value of given TemperatureUnit
+   * @returns {string} the string value of the given TemperatureUnit
+   * @throws {InvalidRequestType} if the given value is not a recognized
+   * TemperatureUnit
    */
   getName: function (unit) {
     switch (unit) {
       case TemperatureUnit.METRIC: return 'metric';
       case TemperatureUnit.STANDARD: return 'standard';
       case TemperatureUnit.IMPERIAL: return 'imperial';
-      default: throw 'unknown unit type';
+      default: throw new InvalidRequestType('Unknown TemperatureUnit');
     }
   }
 });
@@ -48,21 +54,25 @@ const TemperatureUnit = Object.freeze({
  * @constant
  * @readonly
  * @enum {symbol(string)}
+ * @property {symbol(string)} CURRENT the current weather data endpoint ({@link https://openweathermap.org/current})
+ * @property {symbol(string)} FORECAST the forecast weather data endpoint ({@link https://openweathermap.org/forecast5})
  */
 const WeatherRequestType = Object.freeze({
-  FORECAST: Symbol('forecast'), // 5 day & 3 hour forecast
   CURRENT: Symbol('current'),
+  FORECAST: Symbol('forecast'),
 
   /**
    * Returns a string representation of the given WeatherRequestType.
    * @param {WeatherRequestType} type the RequestType to get the name of
-   * @return {string} string value of given TemperatureUnit
+   * @returns {string} string value of given TemperatureUnit
+   * @throws {InvalidRequestType} if the given value is not a recognized
+   * WeatherRequestType
    */
   getName: function (type) {
     switch (type) {
       case WeatherRequestType.CURRENT: return 'current';
       case WeatherRequestType.FORECAST: return 'forecast';
-      default: throw 'unknown request type';
+      default: throw new InvalidRequestType('Unknown WeatherRequestType');
     }
   }
 });
@@ -96,12 +106,46 @@ Object.freeze(BaseUrl);
  * associated URL that is constructed for the request. Parameters for the
  * request can be set using chainable methods that act as both getters and
  * setters for the given property.
+ *
+ * NOTE: The OpenWeather API by default assigns a country code of 'us',
+ * language of 'en' (english), and assumes standard (kelvin) temperature units.
+ * These default values are NOT set by the WeatherRequest object, but noted on
+ * each corresponding function.
+ *
+ * @example
+ * // creates a new request with no properties set
+ * const req = new WeatherRequest();
+ * req.appid('API-KEY')
+ *    .type(WeatherRequestType.CURRENT)
+ *    .city('Austin')
+ *    .language('en');
+ * @example
+ * // constructs a new request with all properties used in the request
+ * const req = new WeatherRequest({
+ *  appid: 'API-KEY',
+ *  type: WeatherRequestType.CURRENT, // CURRENT, or FORECAST
+ *  id: 'city-id',                    // id of city to search for
+ *  zip: '11111',                     // zip code of the city
+ *  city: 'Austin',                   // city name
+ *  lat: 100.113,                     // geo. coordinates of the request
+ *  lon: 55.166,
+ *  limit: 3,                         // limit on number of results
+ *  units: TemperatureUnit.STANDARD,  // which units temperature should be in
+ *  language: 'en'                    // language for weather description
+ * });
+ *
+ * req.key() === 'API-KEY';
+ * req.type() === WeatherRequestType.CURRENT;
+ *
+ * // NOTE: you only need one of: city id, city name & country, zip & country,
+ * // or geo. coordinates for the request
  */
 class WeatherRequest {
   /**
    * Constructs a WeatherRequest object, takes a configuration object to
-   * specify default properties of the request.
-   * @param {object} [config] A configuration object for the request.
+   * specify default properties of the request. The properties used in the
+   * config object can be seen in the examples.
+   * @param {Object} [config] A configuration object for the request
    */
   constructor(config) {
     if (config === null || typeof config !== 'object')  {
@@ -112,17 +156,18 @@ class WeatherRequest {
     this.id_ = config.cityId;
     this.zip_ = config.zip;
     this.city_ = config.city;
-    this.country_ = config.country || 'us';  // default USA
-    this.coords_ = config.coords;
+    this.country_ = config.country;
+    this.lat_ = config.lat;
+    this.lon_ = config.lon;
     this.limit_ = config.limit;
-    this.units_ = config.units || TemperatureUnit.STANDARD; // standard units
-    this.language_ = config.language || 'en'; // default english
+    this.units_ = config.units;
+    this.language_ = config.language;
   }
 
   /**
    * Constructs the url for the corresponding OpenWeather request using all
    * provided parameters.
-   * @return {string} The url that corresponds to the API request
+   * @returns {string} The url that corresponds to the API request
    */
   url() {
     const requestUrl = new url.URL(BaseUrl[this.type_]);
@@ -130,45 +175,43 @@ class WeatherRequest {
 
     // necessary for request
     params.append('mode', 'json');
-    params.append('APPID', this.appid_);
+    params.append('APPID', this.key_);
 
     // optional for requests
     if (this.id_) params.append('id', this.id_);
     if (this.limit_) params.append('cnt', this.limit_);
+    if (this.language_) params.append('lang', this.language_);
     if (this.zip_) params.append('zip', `${this.zip_},${this.country_}`);
     if (this.city_) params.append('q', `${this.city_},${this.country_}`);
-    if (this.coords_) {
+    if (this.units) params.append('units', TemperatureUnit.getName(this.units_));
+    if (this.lat_ && this.lon_) {
       params.append('lat', this.lat_);
       params.append('lon', this.lon_);
     }
-
-    // these are set by default in constructor
-    params.append('lang', this.language_);
-    params.append('units', TemperatureUnit.getName(this.units_));
     return requestUrl.href;
   }
 
   /**
-   * Given an appid value sets the API KEY for this specific request,
+   * Given an key value sets the API KEY for this specific request,
    * otherwise returns the 'appid' for this request. Sets the 'APPID' param of
    * the request url.
-   * @param {string} [appid] The OpenWeather API key to use for this request.
-   * @return {WeatherRequest | string} The 'appid' string assigned to this
-   * request if no parameters are passed, otherwise this.
+   * @param {string} [appid] The OpenWeather API key to use for this request
+   * @returns {WeatherRequest | string} The 'appid' string assigned to this
+   * request if no parameters are passed, otherwise this
    */
-  key(appid) {
+  appid(appid) {
     if (!arguments.length) return this.appid_;
-    this.appid_ = appid;
+    this.appid = appid;
     return this;
   }
 
   /**
-   * Given a WeatherRequestType, specifies which OpenWeather API this request
-   * corresponds to. If no parameters are passed, returns the assigned
+   * Given a WeatherRequestType, specifies which OpenWeather weather API this
+   * request corresponds to. If no parameters are passed, returns the assigned
    * WeatherRequestType.
-   * @param {WeatherRequestType} [requestType] The type of this WeatherRequest.
-   * @return {WeatherRequest | WeatherRequestType} The RequestType assigned to
-   * this request if no parameters are passed, otherwise this.
+   * @param {WeatherRequestType} [requestType] The type of this WeatherRequest
+   * @returns {WeatherRequest | WeatherRequestType} The RequestType assigned to
+   * this request if no parameters are passed, otherwise this
    */
   type(requestType) {
     if (!arguments.length) return this.type_;
@@ -178,12 +221,12 @@ class WeatherRequest {
 
   /**
    * Given a city id, sets the location of the request by specifying the
-   * unique city id. If no parameters are passed, returns the assigned
-   * WeatherRequestType. City ids can be found on the OpenWeather API reference
+   * unique city id. If no parameters are passed, returns the currently
+   * assigned city id. City ids can be found on the OpenWeather API reference
    * at {@link http://bulk.openweathermap.org/sample/}.
-   * @param {string} [cityId] The id of the city to search for.
-   * @return {WeatherRequest | string} The city id assigned to this request
-   * if no parameters are passed, otherwise this.
+   * @param {string} [cityId] The id of the city to search for
+   * @returns {WeatherRequest | string} The city id assigned to this request
+   * if no parameters are passed, otherwise this
    */
   id(cityId) {
     if (!arguments.length) return this.id_;
@@ -194,10 +237,10 @@ class WeatherRequest {
   /**
    * Given a geo coordinates sets the location of the request. If no
    * parameters are passed, reports the assigned coordinates.
-   * @param {number} [lat] The latitude of the location.
-   * @param {number} [lon] The longitude of the location.
-   * @return {WeatherRequest | object} An object containing the 'lat' and 'lon'
-   * properties of the request if no parameters are passed, otherwise this.
+   * @param {number} [lat] The latitude of the location
+   * @param {number} [lon] The longitude of the location
+   * @returns {WeatherRequest | Object} An object containing the 'lat' and 'lon'
+   * properties of the request if no parameters are passed, otherwise this
    */
   coords(lat, lon) {
     if (!arguments.length) return { lat : this.lat_, lon : this.lon_ };
@@ -210,15 +253,15 @@ class WeatherRequest {
    * Given a city name and optionally a country code, sets the location of
    * the request. If no parameters are passed, reports the assigned location.
    * @param {string} [name] The name of the city to search for.
-   * @param {country} [country] The country code for the city (default 'us')
-   * @return {WeatherRequest | object} An object containing the assigned
+   * @param {country} [country] The country code for the city.
+   * @returns {WeatherRequest | Object} An object containing the assigned
    * 'city' name and 'country' code if no parameters are passed, otherwise
-   * this.
+   * this
    */
-  city(name, country = 'us') {
+  city(name, country) {
     if (!arguments.length) return { city: this.city_, country: this.country_ };
     this.city_ = name;
-    this.country_ = country;
+    this.country_ = country || this.country_;
     return this;
   }
 
@@ -226,23 +269,23 @@ class WeatherRequest {
    * Given a zip code and optionally a country code sets the location of the
    * request. If no parameters are passed, reports assigned zip/country codes.
    * @param {string} [code] Zip code
-   * @param {string} [country] Country code, not required
-   * @return {WeatherRequest | object} An object containg the assigned 'zip'
-   * and 'country' codes if no paramters are passed, otherwise, this.
+   * @param {string} [country] Country code for the zip code, not required
+   * @returns {WeatherRequest | Object} An object containg the assigned 'zip'
+   * and 'country' codes if no paramters are passed, otherwise this
    */
-  zip(code, country = undefined) {
+  zip(code, country) {
     if (!arguments.length) return { zip: this.zip_, country: this.country_ };
     this.zip_ = code;
-    this.country_ = country;
+    this.country_ = country || this.country_;
     return this;
   }
 
   /**
    * Given a value, sets a limit on the number of resulting cities that should
    * be returned by the API Request. If no parameters are passed, returns the
-   * assigned limit. By default, API requests have no limit.
+   * assigned limit.
    * @param {number} [count] Max number of results, an integer greater than 0
-   * @return {WeatherRequest | number} The assigned limit value, otherwise this
+   * @returns {WeatherRequest | number} The assigned limit value, otherwise this
    */
   limit(count) {
     if (!arguments.length) return this.limit_;
@@ -259,8 +302,8 @@ class WeatherRequest {
    * request. If no parameters are passed, reports the assigned temperature
    * unit.
    * @param {TemperatureUnit} [type] Which unit type to use for the result
-   * @return {WeatherRequest | TemperatureUnit} The TemperatureUnit of the
-   * request if no parameters are passed, otherwise this.
+   * @returns {WeatherRequest | TemperatureUnit} The TemperatureUnit of the
+   * request if no parameters are passed, otherwise this
    */
   units(type) {
     if (!arguments.length) return this.units_;
@@ -272,10 +315,10 @@ class WeatherRequest {
    * Given a language code, sets the desired language for the result of
    * the API request. If no parameters are passed return the assigned language.
    * Language codes can be found on the OpenWeather API references
-   * @link{https://openweathermap.org/current#multi}.
+   * {@link https://openweathermap.org/current#multi}.
    * @param {string} [code] The language code for the desired language.
-   * @return {WeatherRequest | string} The assigned language code for the
-   * request if no parameters are passed, otherwise this.
+   * @returns {WeatherRequest | string} The assigned language code for the
+   * request if no parameters are passed, otherwise this
    */
   language(code) {
     if (!arguments.length) return this.language_;
@@ -286,8 +329,8 @@ class WeatherRequest {
   /**
    * Executes the API request.
    * @param {function(err, res)} [callback] a callback function that is called
-   * with a possible error and the API response.
-   * @return {Promise} A promise representing the result of the request.
+   * with a possible error and the API response
+   * @returns {Promise} A promise representing the result of the request
    */
   exec(callback) {
     const url = this.url();
@@ -300,16 +343,21 @@ class WeatherRequest {
   }
 }
 
+//--------------------------------------------------------------------
+// Caching methods
+//--------------------------------------------------------------------
+
 /**
- * Adds the response to the HTTP request to the cache.
- * @param {object} response response received from an HTTP request with got.
- * @return {object} response
+ * Adds the response to the HTTP request to the cache. Takes and returns the
+ * response received from the HTTP request.
+ * @param {Object} response the response of an API request
+ * @returns {Object} response
+ * @private
  */
 function addToCache(response) {
   // TODO(la): implement this (payload can be found in response.body)
   return response;
 }
-
 
 //--------------------------------------------------------------------
 // Factories and Other Methods
@@ -319,7 +367,7 @@ function addToCache(response) {
 /**
  * Sets and retrieves the global (default) API key to use for requests.
  * @param {string} appid Default API key
- * @return {string} The current default API KEY
+ * @returns {string} The current default API KEY
  */
 function defaultKey(appid) {
   if (arguments.length) APPID = appid;
@@ -329,7 +377,7 @@ function defaultKey(appid) {
 /**
  * Returns a WeatherRequest for the OpenWeather forecast API. The
  * WeatherRequest will have 'forecast' WeatherRequestType.
- * @return {WeatherRequest} A generic request for the forecast API
+ * @returns {WeatherRequest} A generic request for the forecast API
  */
 function forecast() {
   return new WeatherRequest().type(WeatherRequestType.FORECAST);
@@ -338,7 +386,7 @@ function forecast() {
 /**
  * Returns a WeatherRequest for the OpenWeather current Weather API. The
  * WeatherRequest will have the 'current' WeatherRequestType.
- * @return {WeatherRequest} A generic request for the current weather API
+ * @returns {WeatherRequest} A generic request for the current weather API
  */
 function current() {
   return new WeatherRequest().type(WeatherRequestType.CURRENT);
