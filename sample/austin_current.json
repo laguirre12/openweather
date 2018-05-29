@@ -1,0 +1,43 @@
+{
+  "coord": {
+    "lon": -97.74,
+    "lat": 30.27
+  },
+  "weather": [
+    {
+      "id": 802,
+      "main": "Clouds",
+      "description": "\u03c3\u03c0\u03bf\u03c1\u03b1\u03b4\u03b9\u03ba\u03ad\u03c2 \u03bd\u03b5\u03c6\u03ce\u03c3\u03b5\u03b9\u03c2",
+      "icon": "03d"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 304.82,
+    "pressure": 1014,
+    "humidity": 48,
+    "temp_min": 303.15,
+    "temp_max": 306.15
+  },
+  "visibility": 16093,
+  "wind": {
+    "speed": 4.6,
+    "deg": 150,
+    "gust": 7.7
+  },
+  "clouds": {
+    "all": 40
+  },
+  "dt": 1526159700,
+  "sys": {
+    "type": 1,
+    "id": 2557,
+    "message": 0.0039,
+    "country": "US",
+    "sunrise": 1526125101,
+    "sunset": 1526174198
+  },
+  "id": 4671654,
+  "name": "Austin",
+  "cod": 200
+}

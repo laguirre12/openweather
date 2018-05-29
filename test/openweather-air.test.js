@@ -2,72 +2,111 @@ const url = require('url');
 const assert = require('assert');
 const air = require('../src/openweather-air');
 
-/**
- * Given a url extracts the parameters of the url using the 'url' module.
- * @param {string} url -
- * @return {object} - an object containing the
- */
-function extractParams(url) {
-  return url.parse(url, true).query;
-}
 
-describe('openweather-air', function() {
-  describe('', function() {
+describe('openweather-air', function () {
+  describe('#AirRequest', function () {
+    let req;
+    let key;
+    beforeEach(function () {
+      key = '1111';
+      req = new air.AirRequest();
+    });
+
+    describe('#constructor()', function () {
+    });
+
+    describe('#appid()', function () {
+      it('should set the', function () {
+        req.appid(key);
+        assert.strictEqual(req.appid(), key);
+      });
+    });
+
+    describe('#type()', function () {
+      it('should set the RequestType to CURRENT', function () {
+        req.type(air.AirRequestType.CURRENT);
+        assert.strictEqual(req.type(), air.AirRequestType.CURRENT);
+      });
+
+      it('should set the RequestType to HISTORY', function () {
+        req.type(air.AirRequestType.HISTORY);
+        assert.strictEqual(req.type(), air.AirRequestType.HISTORY);
+      });
+
+      it('should set the RequestType to FORECAST', function () {
+        req.type(air.AirRequestType.FORECAST);
+        assert.strictEqual(req.type(), air.AirRequestType.FORECAST);
+      });
+    });
+
+    describe('#coords()', function () {
+    });
+
+    describe('#datetime()', function () {
+    });
+
+    describe('#url()', function () {
+    });
+
+    describe('#exec()', function () {
+    });
   });
 
-  describe('#defaultKey()', function() {
+  // basic unit tests factory methods
+
+  describe('#defaultKey()', function () {
     const defaultKey = '111';
-    beforeEach(function() {
+    beforeEach(function () {
       air.defaultKey(defaultKey);
     });
 
-    it('should set the default key for a new PollutionRequest', function() {
+    it('should set the default key for a new AirRequest', function () {
       assert.deepStrictEqual(air.defaultKey(), defaultKey);
     });
 
-    it('should reset the default key for a new PollutionRequest', function() {
+    it('should reset the default key for a new AirRequest', function () {
       air.defaultKey('222');
       assert.notStrictEqual(air.defaultKey(), defaultKey);
       assert.strictEqual(air.defaultKey(), '222');
     });
 
-    it('should set the default key for a new PollutionRequest', function() {
-      const req = new air.PollutionRequest();
-      assert.deepStrictEqual(req.key(), defaultKey);
+    it('should set the default key for a new AirRequest', function () {
+      const req = new air.AirRequest();
+      assert.deepStrictEqual(req.appid(), defaultKey);
     });
 
-    it('should be able to override the default key', function() {
-      const req = new air.PollutionRequest();
-      req.key('222');
-      assert.strictEqual(req.key(), '222');
+    it('should be able to override the default key', function () {
+      const req = new air.AirRequest();
+      req.appid('222');
+      assert.strictEqual(req.appid(), '222');
     });
   });
 
-  describe('#ozone()', function() {
-    it('should have the PollutionRequestType.O3 type', function() {
+  describe('#ozone()', function () {
+    it('should have the AirRequestType.O3 type', function () {
       const req = air.ozone();
-      assert.strictEqual(req.type(), air.PollutionRequestType.O3);
+      assert.strictEqual(req.type(), air.AirRequestType.O3);
     });
   });
 
-  describe('#carbonMonoxide()', function() {
-    it('should have the PollutionRequestType.CO type', function() {
+  describe('#carbonMonoxide()', function () {
+    it('should have the AirRequestType.CO type', function () {
       const req = air.carbonMonoxide();
-      assert.strictEqual(req.type(), air.PollutionRequestType.CO);
+      assert.strictEqual(req.type(), air.AirRequestType.CO);
     });
   });
 
-  describe('#sulfurDioxide()', function() {
-    it('should have the PollutionRequestType.SO2 type', function() {
+  describe('#sulfurDioxide()', function () {
+    it('should have the AirRequestType.SO2 type', function () {
       const req = air.sulfurDioxide();
-      assert.strictEqual(req.type(), air.PollutionRequestType.SO2);
+      assert.strictEqual(req.type(), air.AirRequestType.SO2);
     });
   });
 
-  describe('#nitrogenDioxide()', function() {
-    it('should have the PollutionRequestType.NO2 type', function() {
+  describe('#nitrogenDioxide()', function () {
+    it('should have the AirRequestType.NO2 type', function () {
       const req = air.nitrogenDioxide();
-      assert.strictEqual(req.type(), air.PollutionRequestType.NO2);
+      assert.strictEqual(req.type(), air.AirRequestType.NO2);
     });
   });
 });

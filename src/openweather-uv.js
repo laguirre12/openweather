@@ -1,13 +1,13 @@
 /**
  * A module for interacting with the OpenWeather UV Index API (currently in
- * beta). Reference can be found at {@link https://openweathermap.org/api/uvi}.
+ * beta). Reference can be found at: {@link https://openweathermap.org/api/uvi}
  * @module openweather-uv
  * @author laguirre <aguirreluis1234@gmail.com>
  */
 
 const got = require('got');
 const url = require('url');
-const InvalidRequestType = require('./InvalidRequest');
+const InvalidRequestType = require('./openweather-base').InvalidRequestType;
 
 let APPID; // global reference to API_KEY
 
@@ -21,6 +21,7 @@ let APPID; // global reference to API_KEY
  * @constant
  * @readonly
  * @enum {symbol(string)}
+ * @implements {RequestType}
  * @property {symbol(string)} CURRENT current UV index endpoint ({@link https://openweathermap.org/api/uvi#current})
  * @property {symbol(string)} HISTORY history UV index endpoint ({@link https://openweathermap.org/api/uvi#forecast})
  * @property {symbol(string)} FORECAST forecast UV index endpoint ({@link https://openweathermap.org/api/uvi#history})
@@ -73,24 +74,48 @@ Object.freeze(BaseUrl);
  * has type and an associated URL that will constructed for the request.
  * Parameters for the request can be set using chainable methods that act as
  * both getters and setters for the given property.
+ * @implements {OpenWeatherRequest}
  * @example
  * // creates a new UVRequest with no properties set
  * const req = new UVRequest();
  * @example
- * // creates a new UVRequest with all properties used in the request
+ * // creates a new UVRequest for the current data endpoint
+ * // the UVRequest has all properties used by the current data endpoin
  * const req = new UVRequest({
  *   appid: 'API-KEY',
  *   type: UVRequestType.CURRENT,  // either CURRENT, HISTORY, or FORECAST
  *   lat: 100.113,                 // Requests to the UV index API must use
  *   lon: 55.166,                  //  geo coordinates
- *
- *   // TODO(la): properly document these values
- *   cnt: 3,
- *   start: '',
- *   end: ''
+ * });
+ * @example
+ * // creates a new UVRequest for the history data endpoint
+ * // the UVRequest has all properties used in the history data endpoint
+ * const req = new UVRequest({
+ *   appid: 'API-KEY',
+ *   type: UVRequestType.HISTORY,
+ *   lat: 100.113,
+ *   lon: 55.166,
+ *   start: '',        // starting and ending point of timeperiod - Only used by
+ *   end: ''           // the HISTORY data endpoint
+ * });
+ * @example
+ * // creates a new UVRequest for the forecast data endpoint
+ * // the UVRequest has all properties used in the request
+ * const req = new UVRequest({
+ *   appid: 'API-KEY',
+ *   type: UVRequestType.FORECAST,
+ *   lat: 100.113,
+ *   lon: 55.166,
+ *   limit: 3, // number of days in response - used only by FORECAST endpoint
  * });
  */
 class UVRequest {
+  /**
+   * Constructs a UVRequest object, takes an optional configuration
+   * object to specify default properties of the request. The properties used
+   * in the config object can be seen in the examples
+   * @param {Object} [config] A configuration object for the request
+   */
   constructor(config) {
     if (config === null || typeof config !== 'object') {
       config = {};
@@ -122,6 +147,19 @@ class UVRequest {
   }
 
   /**
+   * Given a UVRequestType, sets the UVRequestType for the Request to specify
+   * which OpenWeather UV index data endpoint this request is for.
+   * @param {UVRequestType} [requestType] the type of this UVRequest
+   * @returns {UVRequest | UVRequestType} The RequestType assigned to
+   * this request if no parameters are passed, otherwise this
+   */
+  type(requestType) {
+    if (!arguments.length) return this.type_;
+    this.type_ = requestType;
+    return this;
+  }
+
+  /**
    * Given a geo coordinates sets the location of the request. If no
    * parameters are passed, reports the assigned coordinates.
    * @param {number} [lat] The latitude of the location
@@ -136,18 +174,13 @@ class UVRequest {
     return this;
   }
 
-
-  // TODO(la): document the following two methods fully
-  // TODO(la): should these throw errors? it's fine if you set them, but they
-  // wont be used when creating the url...
-
   /**
    * Sets the number of days ahead that data should be retrieved for. This
    * parameter is only used for the Forecast endpoint, and data is available
    * upto 8 days ahead. For more reference check {@link https://openweathermap.org/api/uvi#forecast}.
    * @param {number} count the number days to return data for
    * @returns {UVRequest | number} the number of days
-   * @throws {InvalidRequestType} The request type must be of FORECAST
+   * @throws {InvalidRequestType} if the request type is not of type FORECAST
    */
   limit(count) {
     if (this.type !== UVRequestType.FORECAST) {
@@ -192,12 +225,12 @@ class UVRequest {
     params.append('lon', this.lon_);
 
     // only used for the 'forecast' endpoint
-    if (this.type_ !== UVRequestType.FORECAST) {
+    if (this.type_ === UVRequestType.FORECAST) {
       params.append('cnt', this.cnt_);
     }
 
     // only used for the 'historical' endpoint'
-    if (this.type_ !== UVRequestType.HISTORY) {
+    if (this.type_ === UVRequestType.HISTORY) {
       params.append('start', this.start_);
       params.append('end', this.end_);
     }
@@ -215,27 +248,10 @@ class UVRequest {
     const url = this.url();
     callback = callback || (() => {});
     return got(url)
-      .then(addToCache)
       .then(res => res.body)
       .then(res => callback(null, res))
       .catch(err => callback(err));
   }
-}
-
-//--------------------------------------------------------------------
-// Caching methods
-//--------------------------------------------------------------------
-
-/**
- * Adds the response to the HTTP request to the cache. Takes and returns the
- * response received from the HTTP request.
- * @param {Object} response the response of an API request
- * @returns {Object} response
- * @private
- */
-function addToCache(response) {
-  // TODO(la): implement this (payload can be found in response.body)
-  return response;
 }
 
 //--------------------------------------------------------------------
@@ -259,7 +275,7 @@ function defaultKey(appid) {
  * @returns {UVRequest} A new UVRequest of type CURRENT
  */
 function current() {
-  return new UVRequest.type(UVRequestType.CURRENT);
+  return new UVRequest().type(UVRequestType.CURRENT);
 }
 
 /**
@@ -268,7 +284,7 @@ function current() {
  * @returns {UVRequest} A new UVRequest
  */
 function history() {
-  return new UVRequest.type(UVRequestType.HISTORY);
+  return new UVRequest().type(UVRequestType.HISTORY);
 }
 
 /**
@@ -277,7 +293,7 @@ function history() {
  * @returns {UVRequest} A new UVRequest
  */
 function forecast() {
-  return new UVRequest.type(UVRequestType.FORECAST);
+  return new UVRequest().type(UVRequestType.FORECAST);
 }
 
 //--------------------------------------------------------------------

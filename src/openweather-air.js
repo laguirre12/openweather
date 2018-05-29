@@ -1,16 +1,17 @@
 /**
  * A module for interacting with the OpenWeather air pollution API (in beta).
  * Provides an interface for sending requests to the following endpoints: <br>
- * {@link https://openweathermap.org/api/pollution/co}<br>
- * {@link https://openweathermap.org/api/pollution/o3}<br>
- * {@link https://openweathermap.org/api/pollution/no2}<br>
- * {@link https://openweathermap.org/api/pollution/so2}.
+ * * {@link https://openweathermap.org/api/pollution/co}
+ * * {@link https://openweathermap.org/api/pollution/o3}
+ * * {@link https://openweathermap.org/api/pollution/no2}
+ * * {@link https://openweathermap.org/api/pollution/so2}
+ * NOTE: As specified by the OpenWeather docs. responses are in JSON
  * @module openweather-air
  * @author laguirre <aguirreluis1234@gmail.com>
  */
 
 const got = require('got');
-const InvalidRequestType = require('./InvalidRequest');
+const InvalidRequestType = require('./openweather-base').InvalidRequestType;
 
 let APPID; // global references to API_KEY
 
@@ -24,6 +25,7 @@ let APPID; // global references to API_KEY
  * @constant
  * @readonly
  * @enum {symbol(string)}
+ * @implements RequestType
  * @property {symbol(string)} O3 the ozone data endpoint ({@link https://openweathermap.org/api/pollution/o3})
  * @property {symbol(string)} CO the carbon-monoxide data endpoint ({@link https://openweathermap.org/api/pollution/co})
  * @property {symbol(string)} SO2 the sulfur-dioxide data endpoint ({@link https://openweathermap.org/api/pollution/so2})
@@ -84,6 +86,7 @@ Object.freeze(BaseUrl);
  * a type and an associated URL that is constructed for the request. Parameters
  * for the request can be set using chainable methods that act as both getters
  * and setters for the given property.
+ * @implements {OpenWeatherRequest}
  * @example
  * // creates a new AirRequest with no properties set
  * const req = new AirRequest();
@@ -172,6 +175,7 @@ class AirRequest {
     return this;
   }
 
+
   /**
    * Given a Date object, sets the time for the AirRequest. If no
    * arguments are passed, reports the assigned Date. By default
@@ -196,28 +200,10 @@ class AirRequest {
     const url = this.url();
     callback = callback || (() => {});
     return got(url)
-      .then(addToCache)
       .then(res => res.body)
       .then(res => callback(null, res))
       .catch(err => callback(err));
   }
-}
-
-
-//--------------------------------------------------------------------
-// Caching methods
-//--------------------------------------------------------------------
-
-/**
- * Adds the response to the HTTP request to the cache. Takes and returns the
- * response received from the HTTP request.
- * @param {Object} response the response of an API request
- * @returns {Object} response
- * @private
- */
-function addToCache(response) {
-  // TODO(la): implement this (payload can be found in response.body)
-  return response;
 }
 
 //--------------------------------------------------------------------

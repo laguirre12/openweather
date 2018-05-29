@@ -9,7 +9,7 @@
 
 const got = require('got');
 const url = require('url');
-const InvalidRequestType = require('./InvalidRequest');
+const InvalidRequestType = require('./openweather-base').InvalidRequestType;
 
 let APPID; // global references to API_KEY
 
@@ -26,6 +26,8 @@ let APPID; // global references to API_KEY
  * @property {symbol(string)} METRIC metric units
  * @property {symbol(string)} STANDARD standard (kelvin) units
  * @property {symbol(string)} IMPERIAL imperial units
+ * @property {function(string)} getName a function to retrieve string names of
+ * units
  */
 const TemperatureUnit = Object.freeze({
   METRIC: Symbol('metric'),
@@ -54,8 +56,11 @@ const TemperatureUnit = Object.freeze({
  * @constant
  * @readonly
  * @enum {symbol(string)}
+ * @implements RequestType
  * @property {symbol(string)} CURRENT the current weather data endpoint ({@link https://openweathermap.org/current})
  * @property {symbol(string)} FORECAST the forecast weather data endpoint ({@link https://openweathermap.org/forecast5})
+ * @property {function(WeatherRequestType)} getName retrieves the string name of
+ * RequestType
  */
 const WeatherRequestType = Object.freeze({
   CURRENT: Symbol('current'),
@@ -96,7 +101,6 @@ BaseUrl[WeatherRequestType.CURRENT] = base  + 'weather?';
 BaseUrl[WeatherRequestType.FORECAST] = base + 'forecast?';
 Object.freeze(BaseUrl);
 
-
 //--------------------------------------------------------------------
 // Request class
 //--------------------------------------------------------------------
@@ -105,13 +109,14 @@ Object.freeze(BaseUrl);
  * Represents an OpenWeather API call. Each WeatherRequest has a type and an
  * associated URL that is constructed for the request. Parameters for the
  * request can be set using chainable methods that act as both getters and
- * setters for the given property.
+ * setters for the given property. WeatherRequests only support a single
+ * location.
  *
  * NOTE: The OpenWeather API by default assigns a country code of 'us',
  * language of 'en' (english), and assumes standard (kelvin) temperature units.
  * These default values are NOT set by the WeatherRequest object, but noted on
  * each corresponding function.
- *
+ * @implements {OpenWeatherRequest}
  * @example
  * // creates a new request with no properties set
  * const req = new WeatherRequest();
@@ -127,6 +132,7 @@ Object.freeze(BaseUrl);
  *  id: 'city-id',                    // id of city to search for
  *  zip: '11111',                     // zip code of the city
  *  city: 'Austin',                   // city name
+ *  country: 'us',                    // country code
  *  lat: 100.113,                     // geo. coordinates of the request
  *  lon: 55.166,
  *  limit: 3,                         // limit on number of results
@@ -153,7 +159,7 @@ class WeatherRequest {
     }
     this.appid_ = config.appid || APPID;
     this.type_ = config.type;
-    this.id_ = config.cityId;
+    this.id_ = config.id;
     this.zip_ = config.zip;
     this.city_ = config.city;
     this.country_ = config.country;
@@ -175,15 +181,15 @@ class WeatherRequest {
 
     // necessary for request
     params.append('mode', 'json');
-    params.append('APPID', this.key_);
+    params.append('APPID', this.appid_);
 
     // optional for requests
-    if (this.id_) params.append('id', this.id_);
     if (this.limit_) params.append('cnt', this.limit_);
-    if (this.language_) params.append('lang', this.language_);
-    if (this.zip_) params.append('zip', `${this.zip_},${this.country_}`);
+    if (this.units_) params.append('units', TemperatureUnit.getName(this.units_));
     if (this.city_) params.append('q', `${this.city_},${this.country_}`);
-    if (this.units) params.append('units', TemperatureUnit.getName(this.units_));
+    if (this.zip_) params.append('zip', `${this.zip_},${this.country_}`);
+    if (this.id_) params.append('id', this.id_);
+    if (this.language_) params.append('lang', this.language_);
     if (this.lat_ && this.lon_) {
       params.append('lat', this.lat_);
       params.append('lon', this.lon_);
@@ -201,7 +207,7 @@ class WeatherRequest {
    */
   appid(appid) {
     if (!arguments.length) return this.appid_;
-    this.appid = appid;
+    this.appid_ = appid;
     return this;
   }
 
@@ -280,10 +286,17 @@ class WeatherRequest {
     return this;
   }
 
+  // TODO(la): remove limit()?
+  // 'cnt should not be used for CURRENT (only used for multi-city requests)
+  // to limit the number of cities in result for Forecast, can use 'cnt'
+  // limit number of days returned (1 to 16) use 'cnt'
+  // to limit the number of cities in result for Forecast16 can use 'Forecast'
+
   /**
    * Given a value, sets a limit on the number of resulting cities that should
    * be returned by the API Request. If no parameters are passed, returns the
-   * assigned limit.
+   * assigned limit. According to the OpenWeather documentation, a default
+   * limit of 10 cities exists and a maximum of 50.
    * @param {number} [count] Max number of results, an integer greater than 0
    * @returns {WeatherRequest | number} The assigned limit value, otherwise this
    */
@@ -292,10 +305,6 @@ class WeatherRequest {
     this.limit_ = count;
     return this;
   }
-
-
-  // TODO(la): should i create functions to set the units
-  // .toStandad(), .toImperial(), .toMetric()
 
   /**
    * Given a TemperatureUnit, sets the expected temperature units for the API
@@ -336,27 +345,10 @@ class WeatherRequest {
     const url = this.url();
     callback = callback || (() => {});
     return got(url)
-      .then(addToCache)
       .then(res => res.body)
       .then(res => callback(null, res))
       .catch(err => callback(err));
   }
-}
-
-//--------------------------------------------------------------------
-// Caching methods
-//--------------------------------------------------------------------
-
-/**
- * Adds the response to the HTTP request to the cache. Takes and returns the
- * response received from the HTTP request.
- * @param {Object} response the response of an API request
- * @returns {Object} response
- * @private
- */
-function addToCache(response) {
-  // TODO(la): implement this (payload can be found in response.body)
-  return response;
 }
 
 //--------------------------------------------------------------------

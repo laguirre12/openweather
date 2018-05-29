@@ -32,6 +32,7 @@ module.exports = {
     "semi": ["error","always"],   // always use semi-colons
     "quotes": ["error","single"], // use single quotes
     "linebreak-style": ["error", "unix"],  // use unix linebreaks
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
 
     "indent": [ "error", 2, {   // require 2 spaces for indent size
       "SwitchCase": 1
