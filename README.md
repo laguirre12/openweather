@@ -16,12 +16,14 @@ Each module consists of a Request Class, Enums for specific API endpoints (and p
 
 
 * `openweather.js`: A module that wraps the other openweather modules together. This module exports all functions and classes from the other openweather modules.
+
         const openweather = require('openweather');
         openweather.defaultKey('<API-KEY>');
 
 * `openweather-base.js`: A module containing a general interface for any OpenWeather API requests and a custom Error type. Both are used in the following modules.
 
 * `openweather-uv.js`: A module for solely interacting with the OpenWeather UV Index data API.
+
         const uv = require('openweather-uv');
         uv.defaultKey('<API-KEY>');
 
@@ -65,6 +67,7 @@ UVRequest methods:
 | url        | ----------- | generates the URL associated with this request |
 
 * `openweather-air.js`: A module for solely interacting with the OpenWeather Air pollution API.
+
       const air = require('openweather-air');
       air.defaultKey('<API-KEY>');
 
@@ -98,6 +101,7 @@ AirRequest methods:
 
 
 * `openweather-weather.js`: A module for solely interacting with the Current Weather and Forecast OpenWeather APIs. Currently only supports the free tier versions of the APIs.
+
       const weather = require('openweather-weather');
       weather.defaultKey('<API-KEY>');
 
