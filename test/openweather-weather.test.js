@@ -249,7 +249,6 @@ describe('openweather-weather', function () {
     // TODO(la): use nock to mock HTTP requests
     // (https://scotch.io/tutorials/nodejs-tests-mocking-http-requests)
     describe('#exec()', function () {
-      const req = weather.forecast().appid('111').city('Edinburg');
     });
   });
 

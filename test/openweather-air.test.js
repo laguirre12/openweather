@@ -2,7 +2,6 @@ const url = require('url');
 const assert = require('assert');
 const air = require('../src/openweather-air');
 
-
 describe('openweather-air', function () {
   describe('#AirRequest', function () {
     let req;
@@ -13,6 +12,8 @@ describe('openweather-air', function () {
     });
 
     describe('#constructor()', function () {
+      describe('', function () {
+      });
     });
 
     describe('#appid()', function () {
@@ -48,11 +49,14 @@ describe('openweather-air', function () {
     describe('#url()', function () {
     });
 
+
+    // TODO(la): use nock to mock HTTP requests
+    // (https://scotch.io/tutorials/nodejs-tests-mocking-http-requests)
     describe('#exec()', function () {
     });
   });
 
-  // basic unit tests factory methods
+  /** Default Key tests below */
 
   describe('#defaultKey()', function () {
     const defaultKey = '111';
@@ -81,6 +85,8 @@ describe('openweather-air', function () {
       assert.strictEqual(req.appid(), '222');
     });
   });
+
+  /** Factory method tests below */
 
   describe('#ozone()', function () {
     it('should have the AirRequestType.O3 type', function () {

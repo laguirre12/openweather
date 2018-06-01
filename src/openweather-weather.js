@@ -1,8 +1,9 @@
 /**
  * A module for interacting with the free OpenWeather weather API. Provides
  * an interface for interacting with the OpenWeather Current Weather API
- * ({@link https://openweathermap.org/current}) and the 5 day forecast API
- * ({@link https://openweathermap.org/forecast5}).
+ * ({@link https://openweathermap.org/current}), the 5 day hourly forecast
+ * API ({@link https://openweathermap.org/forecast5}), and the 16 day daily.
+ * forecast API ({@link https://openweathermap.org/forecast16}).
  * @module openweather-weather
  * @author laguirre <aguirreluis1234@gmail.com>
  */
@@ -14,7 +15,7 @@ const InvalidRequestType = require('./openweather-base').InvalidRequestType;
 let APPID; // global references to API_KEY
 
 //--------------------------------------------------------------------
-// Enums
+// General Enums
 //--------------------------------------------------------------------
 
 /**
@@ -51,20 +52,30 @@ const TemperatureUnit = Object.freeze({
   }
 });
 
+
+//--------------------------------------------------------------------
+// WeatherRequestType Enum
+//--------------------------------------------------------------------
+
 /**
  * Enum for the Openweather API's that are supported by this module.
  * @constant
  * @readonly
  * @enum {symbol(string)}
  * @implements RequestType
- * @property {symbol(string)} CURRENT the current weather data endpoint ({@link https://openweathermap.org/current})
- * @property {symbol(string)} FORECAST the forecast weather data endpoint ({@link https://openweathermap.org/forecast5})
- * @property {function(WeatherRequestType)} getName retrieves the string name of
- * RequestType
+ * @property {symbol(string)} CURRENT the current weather data endpoint
+ * ({@link https://openweathermap.org/current})
+ * @property {symbol(string)} FORECAST_5 the 5 Day forecast weather
+ * data endpoint({@link https://openweathermap.org/forecast5})
+ * @property {symbol(string)} FORECAST_16 the 16 day forecast weather data
+ * endpoint ({@link https://openweathermap.org/forecast16})
+ * @property {function(WeatherRequestType)} getName retrieves the string name
+ * of the RequestType
  */
 const WeatherRequestType = Object.freeze({
   CURRENT: Symbol('current'),
-  FORECAST: Symbol('forecast'),
+  FORECAST_5: Symbol('forecastDay'),
+  FORECAST_16: Symbol('forecastHour'),
 
   /**
    * Returns a string representation of the given WeatherRequestType.
@@ -76,7 +87,8 @@ const WeatherRequestType = Object.freeze({
   getName: function (type) {
     switch (type) {
       case WeatherRequestType.CURRENT: return 'current';
-      case WeatherRequestType.FORECAST: return 'forecast';
+      case WeatherRequestType.FORECAST_5: return 'forecast5';
+      case WeatherRequestType.FORECAST_16: return 'forecast16';
       default: throw new InvalidRequestType('Unknown WeatherRequestType');
     }
   }
@@ -97,8 +109,9 @@ const base = 'http://api.openweathermap.org/data/2.5/';
  * @private
  */
 const BaseUrl = {};
-BaseUrl[WeatherRequestType.CURRENT] = base  + 'weather?';
-BaseUrl[WeatherRequestType.FORECAST] = base + 'forecast?';
+BaseUrl[WeatherRequestType.CURRENT] = base  + 'weather';
+BaseUrl[WeatherRequestType.FORECAST_5] = base + 'forecast';
+BaseUrl[WeatherRequestType.FORECAST_16] = base + 'forecast/daily';
 Object.freeze(BaseUrl);
 
 //--------------------------------------------------------------------
@@ -127,17 +140,17 @@ Object.freeze(BaseUrl);
  * @example
  * // constructs a new request with all properties used in the request
  * const req = new WeatherRequest({
- *  appid: 'API-KEY',
- *  type: WeatherRequestType.CURRENT, // CURRENT, or FORECAST
- *  id: 'city-id',                    // id of city to search for
- *  zip: '11111',                     // zip code of the city
- *  city: 'Austin',                   // city name
- *  country: 'us',                    // country code
- *  lat: 100.113,                     // geo. coordinates of the request
- *  lon: 55.166,
- *  limit: 3,                         // limit on number of results
- *  units: TemperatureUnit.STANDARD,  // which units temperature should be in
- *  language: 'en'                    // language for weather description
+ *   appid: 'API-KEY',
+ *   type: WeatherRequestType.CURRENT, // CURRENT, FORECAST_5, or FORECAST_16
+ *   id: 'city-id',                    // id of city to search for
+ *   zip: '11111',                     // zip code of the city
+ *   city: 'Austin',                   // city name
+ *   country: 'us',                    // country code
+ *   lat: 100.113,                     // geo. coordinates of the request
+ *   lon: 55.166,
+ *   limit: 3,                         // limit on number of results
+ *   units: TemperatureUnit.STANDARD,  // which units temperature should be in
+ *   language: 'en'                    // language for weather description
  * });
  *
  * req.key() === 'API-KEY';
@@ -286,11 +299,8 @@ class WeatherRequest {
     return this;
   }
 
+
   // TODO(la): remove limit()?
-  // 'cnt should not be used for CURRENT (only used for multi-city requests)
-  // to limit the number of cities in result for Forecast, can use 'cnt'
-  // limit number of days returned (1 to 16) use 'cnt'
-  // to limit the number of cities in result for Forecast16 can use 'Forecast'
 
   /**
    * Given a value, sets a limit on the number of resulting cities that should
@@ -368,11 +378,20 @@ function defaultKey(appid) {
 
 /**
  * Returns a WeatherRequest for the OpenWeather forecast API. The
- * WeatherRequest will have 'forecast' WeatherRequestType.
- * @returns {WeatherRequest} A generic request for the forecast API
+ * WeatherRequest will have 'forecast5' WeatherRequestType.
+ * @returns {WeatherRequest} A generic request for the forecast5 API
  */
-function forecast() {
-  return new WeatherRequest().type(WeatherRequestType.FORECAST);
+function forecast5() {
+  return new WeatherRequest().type(WeatherRequestType.FORECAST_5);
+}
+
+/**
+ * Returns a WeatherRequest for the OpenWeather forecast API. The
+ * WeatherRequest will have 'forecast16' WeatherRequestType.
+ * @returns {WeatherRequest} A generic request for the forecast16 API
+ */
+function forecast16() {
+  return new WeatherRequest().type(WeatherRequestType.FORECAST_16);
 }
 
 /**
@@ -391,7 +410,8 @@ function current() {
 
 module.exports = {
   current: current,
-  forecast: forecast,
+  forecast5: forecast5,
+  forecast16: forecast16,
   defaultKey: defaultKey,
 
   WeatherRequest: WeatherRequest,

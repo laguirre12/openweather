@@ -1,7 +1,5 @@
 # OpenWeather
 
-## Install
-
 ## NPM Scripts
 * `doc`: creates the documentation pages found
 * `lint`: runs ESLint on the source code
@@ -9,18 +7,16 @@
 * `test`: runs the test suite
 
 ## Contents
-This is a set of modules meant to interact with various OpenWeather APIs. Documentation for the modules can be found via JSDoc.
+This is a set of modules meant to interact with various OpenWeather APIs. Each module consists of a Request Class, Enums for specific API endpoints (and possible units), and factory methods for creating new Requests. Each Request Class has a fluent interface with chainable setters/getters that set specific properties for the request and an `exec()` method that executes the request. The `exec()` functions support both Promises and callbacks. In order to send requests each Request must be given an API-KEY (`appid`) , which can be set globally for the module.
 
-## Weather Modules
-Each module consists of a Request Class, Enums for specific API endpoints (and possible units), and factory methods for creating new Requests. In order to send requests each Request must be given an API-KEY, which can be set globally for the module. Each Request Class consists of chainable setters/getters that set specific properties for the request and an `exec()` method that executes the request. The `exec()` functions support both Promises and callbacks. Example:
-
+Overview of each module:
 
 * `openweather.js`: A module that wraps the other openweather modules together. This module exports all functions and classes from the other openweather modules.
 
         const openweather = require('openweather');
         openweather.defaultKey('<API-KEY>');
 
-* `openweather-base.js`: A module containing a general interface for any OpenWeather API requests and a custom Error type. Both are used in the following modules.
+* `openweather-base.js`: A module containing a general interface for any OpenWeather API requests and request types, and a custom Error type that are used in the following modules. (NOTE: the interfaces are only described via JSDoc virtual comments)
 
 * `openweather-uv.js`: A module for solely interacting with the OpenWeather UV Index data API.
 
@@ -30,7 +26,7 @@ Each module consists of a Request Class, Enums for specific API endpoints (and p
         const req = uv.current()
                       .coords(101.133, 55.166);
 
-        console.log(req.coords());  // returns { lat: 101.133, lon: 55.166}
+        console.log(req.coords());  // returns { lat: 101.133, lon: 55.166 }
         console.log(req.url());     // string URL associated with the API request
 
         // execute the request using Promises
@@ -43,16 +39,13 @@ Each module consists of a Request Class, Enums for specific API endpoints (and p
           });
 
         // or use a callback
-        function print(err, data) {
+        req.exec(function () {
           if (err) {
             console.log(err);
             return;
           }
           console.log(data);
-        }
-
-        req.exec(print);
-
+        });
 
 UVRequest methods:
 
@@ -61,8 +54,8 @@ UVRequest methods:
 | appid      | appid       | sets/gets the API-KEY of the request |
 | type       | requestType | sets/gets the UVRequestType to specify the API endpoint |
 | coords     | lat, lon    | sets/gets the geo. coords of the request |
-| limit      | count       | sets/gets the number of days returned in the response, used only for forecast data |
-| timePeriod | start, end  | sets/gets the timeperiod used only for historical data|
+| limit      | count       | sets/gets the number of days returned in the response * used only for forecast data  endpoint |
+| timePeriod | start, end  | sets/gets the timeperiod * used only for historical data endpoint |
 | exec       | callback    | executes the API request |
 | url        | ----------- | generates the URL associated with this request |
 
@@ -79,6 +72,7 @@ UVRequest methods:
 
       console.log(req.coords()); // returns { lat: 101.133, lon: 55.166}
       console.log(req.url());    // string URL associated with the API request
+
       // sends the request
       req.exec()
         .then(res => {
@@ -137,9 +131,13 @@ WeatherRequest methods:
 | url      | --------      | generates the URL associated with this request  |
 
 
+For a more complete overview of each of these modules, you can consult the JSDoc.
+
 # TODOs
 1. create an executable for a CLI that imports the openweather modules
 4. add support for the following api's
-   *  - 16 day & daily forecast (paid)
+   *  weatherMap layers
+   *  historial data
 5. create methods for units // .toStandad(), .toImperial(), .toMetric()
 6. add support for `format` (HTML, XML, JSON), default json
+7. Remove `openweather` wrapper module

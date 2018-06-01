@@ -179,13 +179,10 @@ class UVRequest {
    * parameter is only used for the Forecast endpoint, and data is available
    * upto 8 days ahead. For more reference check {@link https://openweathermap.org/api/uvi#forecast}.
    * @param {number} count the number days to return data for
-   * @returns {UVRequest | number} the number of days
-   * @throws {InvalidRequestType} if the request type is not of type FORECAST
+   * @returns {UVRequest | number} the number of days to return data for if
+   * no parameters are passed, otherwise this
    */
   limit(count) {
-    if (this.type !== UVRequestType.FORECAST) {
-      throw new InvalidRequestType('The number of returned days is only available for the forecast endpoint');
-    }
     if (!arguments.length) return this.count_;
     this.count_ = count;
     return this;
@@ -196,16 +193,12 @@ class UVRequest {
    * This parameters are only used for the Historical data endpoint, and the
    * times should be in UNIX time. As stated at {@link https://openweathermap.org/api/uvi#history},
    * the data is available starting from the 2017-06-22.
-   * @param {string} [start] the starting point of the time period in UNIX time
-   * @param {string} [end] the ending point of the time period in UNIX time
+   * @param {string} [start] start point of the time period as a UNIX time string
+   * @param {string} [end] end point of the time period as a UNIX time string
    * @returns {UVRequest | Object} an Object containing the specified start and
    * end times if no parameters are passed, otherwise this
-   * @throws {InvalidRequestType} The request type must be of type HISTORY
   */
   timePeriod(start, end) {
-    if (this.type_ !== UVRequestType.HISTORY) {
-      throw new InvalidRequestType('Time periods are only available for the History data endpoint!');
-    }
     if (!arguments.length) return { start: this.start_, end: this.end_ };
     this.start_ = start;
     this.end_ = end;

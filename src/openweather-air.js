@@ -94,10 +94,10 @@ Object.freeze(BaseUrl);
  * // creates a new AirRequest with all properties used in the request
  * const req = new AirRequest({
  *   appid: 'API-KEY',
- *   type: AirRequestType.O3,  // can be O3, CO, SO2, or NO2
- *   lat: 100.113,                   // Requests to the Air pollution API must
- *   lon: 55.166,                    //  use geo coordinates
- *   datetime: (new Date())          // A Date Object for the request
+ *   type: AirRequestType.O3,          // can be O3, CO, SO2, or NO2
+ *   lat: 100.113,                     // Requests to the Air pollution API
+ *   lon: 55.166,                      //   must use geo coordinates
+ *   datetime: new Date().toISOString  // an ISO time string
  * });
  */
 class AirRequest {
@@ -106,6 +106,11 @@ class AirRequest {
    * object to specify default properties of the request. AirRequest have
    * are given the default API Key (set globally) and a default datetime of the
    * objects creation, unless otherwise specified.
+   *
+   * NOTE: The datetime value should be a ISO 8601 time string. The default
+   * datetime is: `(new Date()).toISOString()`, and according to the
+   * OpenWeather API docs. all dates are UTC only.
+   *
    * @param {Object} [config] A configuration object for the request
    */
   constructor(config) {
@@ -116,7 +121,7 @@ class AirRequest {
     this.type_ = config.type;
     this.lat_ = config.lat;
     this.lon_ = config.lon;
-    this.datetime_ = config.datetime || (new Date());
+    this.datetime_ = config.datetime || (new Date()).toISOString();
   }
 
   /**
@@ -139,8 +144,7 @@ class AirRequest {
    * @returns {string} The url that corresponds to the API request
    */
   url() {
-    const timeStr = this.datetime_.toISOString();
-    const input = `/${this.lat_},${this.lon_}/${timeStr}.json?appid=${this.appid_}`;
+    const input = `/${this.lat_},${this.lon_}/${this.datetime_}.json?appid=${this.appid_}`;
     const requestUrl = encodeURI(BaseUrl[this.type_] + input);
     return requestUrl;
   }
@@ -163,6 +167,7 @@ class AirRequest {
   /**
    * Given a geo coordinates sets the location of the request. If no
    * parameters are passed, reports the assigned coordinates.
+   *
    * @param {number} [lat] The latitude of the location
    * @param {number} [lon] The longitude of the location
    * @returns {AirRequest | Object} An object containing the lat and lon
@@ -177,10 +182,25 @@ class AirRequest {
 
 
   /**
-   * Given a Date object, sets the time for the AirRequest. If no
+   * Given a Date string, sets the time period for the AirRequest. If no
    * arguments are passed, reports the assigned Date. By default
-   * AirRequests have their create time as their default Datetime.
-   * @param {Date} [time] The time of the AirRequest
+   * AirRequests have their creation time as their default datetime. As stated
+   * in on the OpenWeather docs, the time period for Air pollution data
+   * depends on the format of the given time string. Refer to the example taken
+   * from the OpenWeather docs.
+   *
+   * NOTE: The time string should be in the ISO8601 format and should be UTC.
+   *  ex: "2016-03-03T12:00:00Z"
+   * @example
+   * const req = air.ozone();
+   * req.datetime('2016-01-02T15:04:05Z'); // searches between 2016-01-02T15:04:05Z and 2016-01-02T15:04:05.9999Z
+   * req.datetime('2016-01-02T15:04Z'); // searches between 2016-01-02T15:04:00Z and 2016-01-02T15:04:59.9999Z
+   * req.datetime('2016-01-02T15Z'); // searches between 2016-01-02T15:00:00Z and 2016-01-02T15:59:59.9999Z
+   * req.datetime('2016-01-02Z');  // searches between 2016-01-02T00:00:00Z and 2016-01-02T23:59:59.9999Z
+   * req.datetime('2016-01Z'); // searches between 2016-01-01T00:00:00Z and 2016-12-31T23:59:59.9999Z
+   * req.datetime('2016Z'); // searches between 2016-01-01T00:00:00Z and 2016-12-31T23:59:99.9999Z
+
+   * @param {string} [time] An ISO8601 time string
    * @returns {AirRequest | Date} The Date of this AirRequest if no
    * parameters are passed, otherwise this
    */
