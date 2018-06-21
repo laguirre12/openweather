@@ -52,7 +52,6 @@ const TemperatureUnit = Object.freeze({
   }
 });
 
-
 //--------------------------------------------------------------------
 // WeatherRequestType Enum
 //--------------------------------------------------------------------
@@ -80,7 +79,7 @@ const WeatherRequestType = Object.freeze({
   /**
    * Returns a string representation of the given WeatherRequestType.
    * @param {WeatherRequestType} type the RequestType to get the name of
-   * @returns {string} string value of given TemperatureUnit
+   * @returns {string} string value of given WeatherRequestType
    * @throws {InvalidRequestType} if the given value is not a recognized
    * WeatherRequestType
    */
@@ -299,16 +298,14 @@ class WeatherRequest {
     return this;
   }
 
-
-  // TODO(la): remove limit()?
-
   /**
-   * Given a value, sets a limit on the number of resulting cities that should
-   * be returned by the API Request. If no parameters are passed, returns the
-   * assigned limit. According to the OpenWeather documentation, a default
-   * limit of 10 cities exists and a maximum of 50.
+   * Sets a limit on the length of the response data. This value specifies the
+   * the `cnt` parameter of the request, and limits the amount of data returned
+   * in the forecasts.
+   * NOTE: This parameter is not used for the CURRENT weather endpoint.
    * @param {number} [count] Max number of results, an integer greater than 0
-   * @returns {WeatherRequest | number} The assigned limit value, otherwise this
+   * @returns {WeatherRequest | number} The assigned `limit` value, otherwise
+   * this
    */
   limit(count) {
     if (!arguments.length) return this.limit_;
@@ -319,7 +316,8 @@ class WeatherRequest {
   /**
    * Given a TemperatureUnit, sets the expected temperature units for the API
    * request. If no parameters are passed, reports the assigned temperature
-   * unit.
+   * unit. According to the API documentation the default unit is kelvin
+   * [TemperatureUNIT.STANDARD]{@link TemperatureUnit#STANDARD}.
    * @param {TemperatureUnit} [type] Which unit type to use for the result
    * @returns {WeatherRequest | TemperatureUnit} The TemperatureUnit of the
    * request if no parameters are passed, otherwise this
@@ -362,7 +360,7 @@ class WeatherRequest {
 }
 
 //--------------------------------------------------------------------
-// Factories and Other Methods
+// Factories and Other functions
 //--------------------------------------------------------------------
 
 

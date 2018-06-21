@@ -33,7 +33,7 @@ const UVRequestType = Object.freeze({
 
   /**
    * Returns a string representation of the given UVRequestType.
-   * @param {UVRequestType} type the request type to get the name of
+   * @param {UVRequestType} type the UVRequestType to get the name of
    * @returns {string} the string name of the request type
    */
   getName(type) {

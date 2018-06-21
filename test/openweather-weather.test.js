@@ -327,9 +327,7 @@ describe('openweather-weather', function () {
     });
   });
 
-
-
-  // RequestType tests
+  /** RequestType test */
   describe('WeatherRequestType Enum', function () {
     describe('#getName()', function () {
       it('should return current', function () {
@@ -338,10 +336,22 @@ describe('openweather-weather', function () {
         assert.strictEqual(name, 'current');
       });
 
-      it('should return forecast', function () {
-        const forecast = weather.WeatherRequestType.FORECAST;
+      it('should return forecast5', function () {
+        const forecast = weather.WeatherRequestType.FORECAST_5;
         const name = weather.WeatherRequestType.getName(forecast);
-        assert.strictEqual(name, 'forecast');
+        assert.strictEqual(name, 'forecast5');
+      });
+
+      it('should return forecast16', function () {
+        const forecast = weather.WeatherRequestType.FORECAST_16;
+        const name = weather.WeatherRequestType.getName(forecast);
+        assert.strictEqual(name, 'forecast16');
+      });
+
+      it('should throw an InvalidRequestType', function () {
+        const other = null; // dummy value
+        const func = () => uv.UVRequestType.getName(other);
+        assert.throws(func, InvalidRequestType, 'Unknown UVRequestType');
       });
     });
   });

@@ -5,7 +5,8 @@
  * * {@link https://openweathermap.org/api/pollution/o3}
  * * {@link https://openweathermap.org/api/pollution/no2}
  * * {@link https://openweathermap.org/api/pollution/so2}
- * NOTE: As specified by the OpenWeather docs. responses are in JSON
+ *
+ * NOTE: As specified by the OpenWeather docs. all responses are currently available as JSON
  * @module openweather-air
  * @author laguirre <aguirreluis1234@gmail.com>
  */
@@ -26,10 +27,14 @@ let APPID; // global references to API_KEY
  * @readonly
  * @enum {symbol(string)}
  * @implements RequestType
- * @property {symbol(string)} O3 the ozone data endpoint ({@link https://openweathermap.org/api/pollution/o3})
- * @property {symbol(string)} CO the carbon-monoxide data endpoint ({@link https://openweathermap.org/api/pollution/co})
- * @property {symbol(string)} SO2 the sulfur-dioxide data endpoint ({@link https://openweathermap.org/api/pollution/so2})
- * @property {symbol(string)} NO2 the nitrogen-dioxide data endpoint ({@link https://openweathermap.org/api/pollution/no2})
+ * @property {symbol(string)} O3 the ozone data endpoint
+ * ({@link https://openweathermap.org/api/pollution/o3})
+ * @property {symbol(string)} CO the carbon-monoxide data endpoint
+ * ({@link https://openweathermap.org/api/pollution/co})
+ * @property {symbol(string)} SO2 the sulfur-dioxide data endpoint
+ * ({@link https://openweathermap.org/api/pollution/so2})
+ * @property {symbol(string)} NO2 the nitrogen-dioxide data endpoint
+ * ({@link https://openweathermap.org/api/pollution/no2})
  */
 const AirRequestType = Object.freeze({
   O3: Symbol('o3'),

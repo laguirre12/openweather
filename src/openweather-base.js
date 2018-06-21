@@ -1,6 +1,7 @@
 /**
  * A module containing various interfaces and and a custom error used
- * throughout the openweather modules.
+ * throughout the openweather modules. The interfaces described in this
+ * module are only descrbied by JSDoc virtual comments.
  * @module openweather-base
  * @author laguirre <aguirreluis1234@gmail.com>
  */
@@ -75,7 +76,7 @@
  */
 
 //------------------------------------------------------------------------
-// Custom Error
+// Custom Errors
 //------------------------------------------------------------------------
 
 /**

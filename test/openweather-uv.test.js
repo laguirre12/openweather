@@ -3,6 +3,7 @@ const nock = require('nock');
 const assert = require('assert');
 
 const uv = require('../src/openweather-uv');
+const InvalidRequestType = require('../src/openweather-base').InvalidRequestType;
 
 describe('openweather-uv', function () {
 
@@ -32,7 +33,7 @@ describe('openweather-uv', function () {
         }); */
       });
 
-      it('should set all properties for a HISTORY request', function () {
+      it('should set all properties used for a HISTORY request', function () {
         const config = {
           appid: 'API-KEY',
           type: uv.UVRequestType.HISTORY,
@@ -42,6 +43,9 @@ describe('openweather-uv', function () {
           end: ''
         };
         req = new uv.UVRequest(config);
+      });
+
+      it('should set all properties used for CURRENT request', function () {
       });
     });
 
@@ -128,6 +132,7 @@ describe('openweather-uv', function () {
     });
   });
 
+
   /** Factory method tests below */
 
   describe('#current()', function () {
@@ -148,6 +153,36 @@ describe('openweather-uv', function () {
     it('should have a RequestType of HISTORY', function () {
       const req = uv.history();
       assert.strictEqual(req.type(), uv.UVRequestType.HISTORY);
+    });
+  });
+
+
+  /** RequestType test */
+  describe('UVRequestType enum', function () {
+    describe('#getName()', function () {
+      it('should return current', function () {
+        const current = uv.UVRequestType.CURRENT;
+        const name = uv.UVRequestType.getName(current);
+        assert.strictEqual(name, 'current');
+      });
+
+      it('should return history', function () {
+        const history = uv.UVRequestType.HISTORY;
+        const name = uv.UVRequestType.getName(history);
+        assert.strictEqual(name, 'history');
+      });
+
+      it('should return forecast', function () {
+        const forecast = uv.UVRequestType.FORECAST;
+        const name = uv.UVRequestType.getName(forecast);
+        assert.strictEqual(name, 'forecast');
+      });
+
+      it('should thrown an InvalidRequestType error', function () {
+        const other = null; // dummy value
+        const func = () => uv.UVRequestType.getName(other);
+        assert.throws(func, InvalidRequestType, 'Unknown UVRequestType');
+      });
     });
   });
 });
