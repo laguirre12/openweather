@@ -1,27 +1,31 @@
 # OpenWeather
 
-[Install](#install)
-
-[NPM Scripts](#npm-scripts)
-
-[Overview](#overview)
-
+[Install](#install)<br/>
+[NPM Scripts](#npm-scripts)<br/>
+[Overview](#overview)<br/>
 [OpenWeather-UV](#openweather\-uv)
-  * [UVRequest methods](#uvrequest-methods:)
-  * [UVRequestType's](#uvrequesttype's:)
-  * [Other Openweather-uv Functions](#other-openweather\-uv-functions:)
+  - [UVRequest methods](#uvrequest-methods:)
+  - [UVRequestType's](#uvrequesttype's:)
+  - [Other Openweather-uv Functions](#other-openweather\-uv-functions:)
 
 [OpenWeather-Air](#openweather\-air)
-  * [AirRequest methods](#airrequest-methods:)
-  * [AirRequestType's](#airrequesttype's:)
-  * [Other Openweather-air Functions](#other-openweather\-air-functions:)
+  - [AirRequest methods](#airrequest-methods:)
+  - [AirRequestType's](#airrequesttype's:)
+  - [Other Openweather-air Functions](#other-openweather\-air-functions:)
 
 [OpenWeather-Weather](#openweather\-weather)
-  * [WeatherRequest methods](#weatherrequest-methods:)
-  * [WeatherRequestType's](#weatherrequesttype's:)
-  * [Other Openweather-weather Functions](#other-openweather\-weather-functions:)
+  - [WeatherRequest methods](#weatherrequest-methods:)
+  - [WeatherRequestType's](#weatherrequesttype's:)
+  - [Other Openweather-weather Functions](#other-openweather\-weather-functions:)
 
 ## Install
+Install this project directly from this repository with npm by running one of the following commands:
+```
+npm install git+https://git@github.com/laguirre12/openweather.git
+npm install laguirre12/openweather
+npm install github:laguirre12/openweather
+```
+For more information on installing a dependency directly from a github repo, refer to the [NPM Install documentation](https://docs.npmjs.com/cli/install).
 
 ## NPM Scripts
 * `doc`: creates the documentation pages found
@@ -42,7 +46,8 @@ Overview of each module:
 
 * `openweather-air.js`: A module for solely interacting with the [OpenWeather Air pollution API](https://openweathermap.org/api/pollution/co). The module consists of an `AirRequest` class, `AirRequestType`'s to specify which endpoint is called, and factory functions to create new `AirRequest`'s.
 
-* `openweather-weather.js`: A module for solely interacting with the Current Weather and Forecast OpenWeather APIs. The module consists of a `WeatherRequest` class, `WeatherRequestType`'s to specify which endpoint is called, and factory functions to create new `WeatherRequest`'s.
+* `openweather-weather.js`: A module for interacting with the [Openweather Current Weather API](https://openweathermap.org/current), [OpenWeather 5 day/3 hour Forecast API](https://openweathermap.org/forecast5), and the [OpenWeather 16 day Forecast API](https://openweathermap.org/forecast16). These three API's are grouped together because they have similar request parameters. The module consists of a `WeatherRequest` class, `WeatherRequestType`'s to specify which endpoint is called, and factory functions to create new `WeatherRequest`'s.
+
 
 ## OpenWeather-uv
     const uv = require('openweather-uv');
@@ -219,13 +224,14 @@ Overview of each module:
 For a more complete overview of each of these modules, you can consult the JSDoc.
 
 # TODOs
-0. make repo public and write install script
+0. make repo public
 1. create an executable for a CLI that imports the openweather modules
-5. create methods for units // .toStandad(), .toImperial(), .toMetric()
-
 2. Finish Testing:
   * `openweather-air` constructor
   * `openweather-air` coords
   * `openweather-air` datetime
   * `openweather-air` url
   * `openweather-air` exec
+3. provide description for each detailed section of the README
+
+
