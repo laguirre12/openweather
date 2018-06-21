@@ -1,12 +1,25 @@
 # OpenWeather
 
-[Install](#install)<br/>
-[NPM Scripts](#npm-scripts)<br/>
-[Overview](#overview)<br/>
-[Contents](#contents)
- * [OpenWeather-Uv](#openweather\-uv)
- * [OpenWeather-Air](#openweather\_air)
- * [OpenWeather-Weather](#openweather\_weather)
+[Install](#install)
+
+[NPM Scripts](#npm-scripts)
+
+[Overview](#overview)
+
+[OpenWeather-UV](#openweather\-uv)
+  * [UVRequest methods](#uvrequest-methods:)
+  * [UVRequestType's](#uvrequesttype's:)
+  * [Other Openweather-uv Functions](#other-openweather\-uv-functions:)
+
+[OpenWeather-Air](#openweather\-air)
+  * [AirRequest methods](#airrequest-methods:)
+  * [AirRequestType's](#airrequesttype's:)
+  * [Other Openweather-air Functions](#other-openweather\-air-functions:)
+
+[OpenWeather-Weather](#openweather\-weather)
+  * [WeatherRequest methods](#weatherrequest-methods:)
+  * [WeatherRequestType's](#weatherrequesttype's:)
+  * [Other Openweather-weather Functions](#other-openweather\-weather-functions:)
 
 ## Install
 
@@ -17,7 +30,7 @@
 * `test`: runs the test suite
 
 ## Overview
-This is a set of modules meant to interact with various OpenWeather APIs. Each module consists of a Request Class, Enums for specific API endpoints (and possible units), and factory methods for creating new Requests. Each Request Class has a fluent interface with chainable setters/getters that set specific properties for the request and an `exec()` method that executes the request. The `exec()` functions support both Promises and callbacks. In order to send requests each Request must be given an API-KEY (`appid`) , which can be set globally for the module.
+This is a set of modules meant to interact with various OpenWeather APIs. Each module is meant to cover related Openweather API endpoints and consists of a Request Class, Enums for specific API endpoints (and possible units), and factory methods for creating new Requests. Each Request Class has a fluent interface with chainable setters/getters that set specific properties for the request and an `exec()` method that executes the request. The `exec()` functions support both Promises and callbacks. In order to send requests each Request must be given an API-KEY (`appid`) , which can be set globally for the module.
 
 As of now, these modules only allow for the response format to be in JSON.
 
@@ -25,45 +38,42 @@ Overview of each module:
 
 * `openweather-base.js`: A module containing a general interface for any OpenWeather API requests and request types, and a custom Error types that are used in the following modules. (NOTE: the interfaces are only described via JSDoc virtual comments)
 
-* `openweather-uv.js`: A module for solely interacting with the [(OpenWeather UV Index data API)](https://openweathermap.org/api/uvi). The module consists of a `UVRequest` class, `UVRequestType`'s to specify which endpoint is called, and factory functions to create new `UVRequest`'s. For example:
+* `openweather-uv.js`: A module for solely interacting with the [OpenWeather UV Index data API](https://openweathermap.org/api/uvi). The module consists of a `UVRequest` class, `UVRequestType`'s to specify which endpoint is called, and factory functions to create new `UVRequest`'s. For example:
 
 * `openweather-air.js`: A module for solely interacting with the [OpenWeather Air pollution API](https://openweathermap.org/api/pollution/co). The module consists of an `AirRequest` class, `AirRequestType`'s to specify which endpoint is called, and factory functions to create new `AirRequest`'s.
 
 * `openweather-weather.js`: A module for solely interacting with the Current Weather and Forecast OpenWeather APIs. The module consists of a `WeatherRequest` class, `WeatherRequestType`'s to specify which endpoint is called, and factory functions to create new `WeatherRequest`'s.
 
-## Contents
+## OpenWeather-uv
+    const uv = require('openweather-uv');
+    uv.defaultKey('<API-KEY>');
 
-### OpenWeather-uv
+    const req = uv.current()
+                  .coords(101.133, 55.166);
 
-      const uv = require('openweather-uv');
-      uv.defaultKey('<API-KEY>');
+    console.log(req.appid());   // prints `<API-KEY>`
+    console.log(req.coords());  // prints `{ lat: 101.133, lon: 55.166 }`
+    console.log(req.url());     // string URL associated with the API request
 
-      const req = uv.current()
-                    .coords(101.133, 55.166);
-
-      console.log(req.appid());   // prints `<API-KEY>`
-      console.log(req.coords());  // prints `{ lat: 101.133, lon: 55.166 }`
-      console.log(req.url());     // string URL associated with the API request
-
-      // execute the request using a Promise
-      req.exec()
-        .then(data => {
-          console.log(data);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-
-      // or with a callback
-      req.exec(function (err, data) {
-        if (err) {
-          console.log(err);
-          return;
-        }
+    // execute the request using a Promise
+    req.exec()
+      .then(data => {
         console.log(data);
+      })
+      .catch(err => {
+        console.log(err);
       });
 
-#### UVRequest methods:
+    // or with a callback
+    req.exec(function (err, data) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log(data);
+    });
+
+### UVRequest methods:
 
 |   method   |   params    |  description  |
 | ---------  |   ------    | ------------- |
@@ -75,7 +85,7 @@ Overview of each module:
 | exec       | callback    | executes the API request |
 | url        | ----------- | generates the URL associated with this request |
 
-#### RequestType's:
+### UVRequestType's:
 
 | UVRequestType | description |
 | -------- | ----------- |
@@ -83,7 +93,7 @@ Overview of each module:
 | HISTORY  | used to specify a UVRequest is for the history data endpoint |
 | FORECAST | used to specify a UVRequest is for the forecast data endpoint |
 
-#### Other functions:
+### Other Openweather-uv functions:
 
 | function | params | description |
 | -------- | ------ | ----------- |
@@ -95,29 +105,29 @@ Overview of each module:
 
 
 
-### Openweather-air
-      const air = require('openweather-air');
-      air.defaultKey('<API-KEY>');
+## Openweather-air
+    const air = require('openweather-air');
+    air.defaultKey('<API-KEY>');
 
-      // a request to the Air pollution data API for the ozone endpoint
-      const req = air.ozone()
-                     .appid('<Another API-KEY>') // override default key
-                     .coords(101.133, 55.166)
-                     .datetime(new Date());
+    // a request to the Air pollution data API for the ozone endpoint
+    const req = air.ozone()
+                   .appid('<Another API-KEY>') // override default key
+                   .coords(101.133, 55.166)
+                   .datetime(new Date());
 
-      console.log(req.coords()); // returns { lat: 101.133, lon: 55.166}
-      console.log(req.url());    // string URL associated with the API request
+    console.log(req.coords()); // returns { lat: 101.133, lon: 55.166}
+    console.log(req.url());    // string URL associated with the API request
 
-      // sends the request
-      req.exec()
-        .then(res => {
-          console.log(res);
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    // sends the request
+    req.exec()
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
 
-#### AirRequest methods:
+### AirRequest methods:
 
 |  method  |    params   | description  |
 | -------- | ----------- |------------- |
@@ -128,7 +138,7 @@ Overview of each module:
 | exec     | callback    | executes the API request |
 | url      | ----------- | generates the URL associated with this request |
 
-#### RequestType's:
+### AirRequestType's:
 
 | AirRequestType | description |
 | -------- | ----------- |
@@ -137,7 +147,7 @@ Overview of each module:
 | SO2 | used to specify a AirRequest is for the sulfur-dioxide data endpoint |
 | NO2 | used to specify a AirRequest is for the nitroge-dioxide data endpoint |
 
-#### Other functions:
+### Other Openweather-air functions:
 
 | function        | params | description |
 | --------------- | ------ | ----------- |
@@ -150,30 +160,29 @@ Overview of each module:
 
 
 
-### Openweather-weather
+## Openweather-weather
+    const weather = require('openweather-weather');
+    weather.defaultKey('<API-KEY>');
 
-      const weather = require('openweather-weather');
-      weather.defaultKey('<API-KEY>');
+    // a request to the free Weather Forecast with the default API key
+    const req = weather.forecast()
+                       .city('Austin')
+                       .units(weather.TemperatureUnit.METRIC); // for celsius
 
-      // a request to the free Weather Forecast with the default API key
-      const req = weather.forecast()
-                         .city('Austin')
-                         .units(weather.TemperatureUnit.METRIC); // for celsius
+    console.log(req.units());  // returns weather.TemperatureUnit.METRIC
+    console.log(req.city());   // returns 'Austin'
+    console.log(req.url());    // the string URL corresponding to the API request
 
-      console.log(req.units());  // returns weather.TemperatureUnit.METRIC
-      console.log(req.city());   // returns 'Austin'
-      console.log(req.url());    // the string URL corresponding to the API request
+    // sends the request
+    req.exec()
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
 
-      // sends the request
-      req.exec()
-        .then(res => {
-          console.log(res);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-
-#### WeatherRequest methods:
+### WeatherRequest methods:
 
 |  method  |     params    | description  |
 | -------- | ------------- |------------- |
@@ -189,7 +198,7 @@ Overview of each module:
 | exec     | callback      | executes the API request |
 | url      | --------      | generates the URL associated with this request  |
 
-#### RequestType's:
+### WeatherRequestType's:
 
 | WeatherRequestType | description |
 | ------------------ | ----------- |
@@ -197,7 +206,7 @@ Overview of each module:
 | FORECAST\_5   | used to specify a WeatherRequest is for a 3-hour interval 5 day forecast |
 | FORECAST\_16  | used to specify a WeatherRequest is for a 16 day forecast |
 
-#### Other functions:
+### Other Openweather-weather functions:
 
 | function   | params | description |
 | -----------| ------ | ----------- |
