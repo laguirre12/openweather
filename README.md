@@ -225,13 +225,9 @@ For a more complete overview of each of these modules, you can consult the JSDoc
 
 # TODOs
 0. make repo public
-1. create an executable for a CLI that imports the openweather modules
-2. Finish Testing:
-  * `openweather-air` constructor
-  * `openweather-air` coords
-  * `openweather-air` datetime
-  * `openweather-air` url
-  * `openweather-air` exec
+2. Finish Testing
 3. provide description for each detailed section of the README
-
-
+4. links to tables are not rendered correctly on github
+5. code coverage reports
+6. github badges
+7. update code samples to show proper way to import

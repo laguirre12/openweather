@@ -41,7 +41,7 @@ const UVRequestType = Object.freeze({
       case UVRequestType.CURRENT: return 'current';
       case UVRequestType.HISTORY: return 'history';
       case UVRequestType.FORECAST: return 'forecast';
-      default: throw InvalidRequestType('Unknown UVRequestType');
+      default: throw new InvalidRequestType('Unknown UVRequestType');
     }
   }
 });

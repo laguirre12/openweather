@@ -1,25 +1,25 @@
 {
   "name": "openweather",
-  "version": "0.1.0",
-  "description": "A group of modules for interacting with varioius OpenWeather API's",
-  "main": "openweather.js",
+  "version": "0.0.0",
+  "description": "A set of modules for interacting with various OpenWeather API's",
+  "main": "src/openweather.js",
   "scripts": {
     "doc": "jsdoc src --configure .jsdoc.json --verbose",
-    "lint": "eslint src",
+    "lint": "eslint src test",
     "clean": "rm -rdf node_modules/ docs/ npm-debug.log",
     "test": "mocha"
   },
   "author": "laguirre",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^5.0.1",
     "got": "^8.3.1"
   },
   "devDependencies": {
+    "dotenv": "^6.0.0",
     "eslint": "^4.19.1",
     "eslint-plugin-jsdoc": "^3.7.1",
     "jsdoc": "^3.5.5",
-    "minami": "^1.2.3",
+    "jsdoc-template": "git+https://git@github.com/braintree/jsdoc-template.git",
     "mocha": "^5.2.0",
     "nock": "^9.3.3"
   },

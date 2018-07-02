@@ -6,7 +6,8 @@
  * * {@link https://openweathermap.org/api/pollution/no2}
  * * {@link https://openweathermap.org/api/pollution/so2}
  *
- * NOTE: As specified by the OpenWeather docs. all responses are currently available as JSON
+ * NOTE: As specified by the OpenWeather docs, all responses are currently
+ * available as JSON
  * @module openweather-air
  * @author laguirre <aguirreluis1234@gmail.com>
  */
@@ -15,7 +16,6 @@ const got = require('got');
 const InvalidRequestType = require('./openweather-base').InvalidRequestType;
 
 let APPID; // global references to API_KEY
-
 
 //--------------------------------------------------------------------
 // Enums
@@ -51,10 +51,10 @@ const AirRequestType = Object.freeze({
    */
   getName: function (type) {
     switch (type) {
-      case AirRequestType.O3: return 'ozone';
-      case AirRequestType.CO: return 'carbon-monoxide';
-      case AirRequestType.SO2: return 'sulfur-dioxide';
-      case AirRequestType.NO2: return 'nitrogen-dioxide';
+      case AirRequestType.O3: return 'o3';    // ozone
+      case AirRequestType.CO: return 'co';   // carbon-monoxide
+      case AirRequestType.SO2: return 'so2'; //sulfur-dioxide
+      case AirRequestType.NO2: return 'no2'; // nitrogen-dioxide
       default: throw new InvalidRequestType('Unknown AirRequestType');
     }
   }
@@ -115,7 +115,6 @@ class AirRequest {
    * NOTE: The datetime value should be a ISO 8601 time string. The default
    * datetime is: `(new Date()).toISOString()`, and according to the
    * OpenWeather API docs. all dates are UTC only.
-   *
    * @param {Object} [config] A configuration object for the request
    */
   constructor(config) {
@@ -199,18 +198,18 @@ class AirRequest {
    * @example
    * const req = air.ozone();
    * req.datetime('2016-01-02T15:04:05Z'); // searches between 2016-01-02T15:04:05Z and 2016-01-02T15:04:05.9999Z
-   * req.datetime('2016-01-02T15:04Z'); // searches between 2016-01-02T15:04:00Z and 2016-01-02T15:04:59.9999Z
-   * req.datetime('2016-01-02T15Z'); // searches between 2016-01-02T15:00:00Z and 2016-01-02T15:59:59.9999Z
-   * req.datetime('2016-01-02Z');  // searches between 2016-01-02T00:00:00Z and 2016-01-02T23:59:59.9999Z
-   * req.datetime('2016-01Z'); // searches between 2016-01-01T00:00:00Z and 2016-12-31T23:59:59.9999Z
-   * req.datetime('2016Z'); // searches between 2016-01-01T00:00:00Z and 2016-12-31T23:59:99.9999Z
-
+   * req.datetime('2016-01-02T15:04Z');    // searches between 2016-01-02T15:04:00Z and 2016-01-02T15:04:59.9999Z
+   * req.datetime('2016-01-02T15Z');       // searches between 2016-01-02T15:00:00Z and 2016-01-02T15:59:59.9999Z
+   * req.datetime('2016-01-02Z');          // searches between 2016-01-02T00:00:00Z and 2016-01-02T23:59:59.9999Z
+   * req.datetime('2016-01Z');             // searches between 2016-01-01T00:00:00Z and 2016-12-31T23:59:59.9999Z
+   * req.datetime('2016Z');                // searches between 2016-01-01T00:00:00Z and 2016-12-31T23:59:99.9999Z
+   *
    * @param {string} [time] An ISO8601 time string
-   * @returns {AirRequest | Date} The Date of this AirRequest if no
-   * parameters are passed, otherwise this
+   * @returns {AirRequest | Date} The Date of this AirRequest if no parameters
+   * are passed, otherwise this
    */
   datetime(time) {
-    if (!arguments.length) return this.time_;
+    if (!arguments.length) return this.datetime_;
     this.datetime_ = time;
     return this;
   }

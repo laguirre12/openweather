@@ -7,13 +7,14 @@ const InvalidRequestType = require('../src/openweather-base').InvalidRequestType
 
 describe('openweather-uv', function () {
 
-  /** UVRequest Class tests below */
+  /** UVRequest Class tests */
   describe('#UVRequest', function () {
     let req;
     beforeEach(function () {
       req = new uv.UVRequest();
     });
 
+    // TODO(la): finish this
     describe('#constructor()', function () {
       it('should have no default properties set', function () {
         req = new uv.UVRequest();
@@ -45,7 +46,10 @@ describe('openweather-uv', function () {
         req = new uv.UVRequest(config);
       });
 
-      it('should set all properties used for CURRENT request', function () {
+      it('should set all properties used for a CURRENT request', function () {
+      });
+
+      it('should set all properties used for a FORECAST ', function () {
       });
     });
 
@@ -60,17 +64,17 @@ describe('openweather-uv', function () {
     describe('#type()', function () {
       it('should set the RequestType to CURRENT', function () {
         req.type(uv.UVRequestType.CURRENT);
-        assert.strictEqual(req.type, uv.UVRequestType.CURRENT);
+        assert.strictEqual(req.type(), uv.UVRequestType.CURRENT);
       });
 
       it('should set the RequestType to HISTORY', function () {
         req.type(uv.UVRequestType.HISTORY);
-        assert.strictEqual(req.type, uv.UVRequestType.HISTORY);
+        assert.strictEqual(req.type(), uv.UVRequestType.HISTORY);
       });
 
       it('should set the RequestType to FORECAST', function () {
         req.type(uv.UVRequestType.FORECAST);
-        assert.strictEqual(req.type, uv.UVRequestType.FORECAST);
+        assert.strictEqual(req.type(), uv.UVRequestType.FORECAST);
       });
     });
 
@@ -87,11 +91,13 @@ describe('openweather-uv', function () {
       it('should set alimit on the number of days in the forecast', function () {
         const limitValue = 3;
         req.type(uv.UVRequestType.FORECAST);
-        req.limit(limitValue);      // limit should only be set for FORECAST type
+        req.limit(limitValue);   // limit should only be set for FORECAST type
         assert.strictEqual(req.limit(), limitValue);
       });
     });
 
+
+    // TODO(la): extract parameters from the url
     describe('#url()', function () {
     });
 
@@ -102,8 +108,10 @@ describe('openweather-uv', function () {
     });
   });
 
-  /** Default Key tests below */
 
+
+
+  /** Default Key tests below */
   describe('#defaultKey()', function () {
     const defaultKey = '111';
     beforeEach(function () {
@@ -134,7 +142,6 @@ describe('openweather-uv', function () {
 
 
   /** Factory method tests below */
-
   describe('#current()', function () {
     it('should have a RequestType of CURRENT', function () {
       const req = uv.current();
@@ -157,7 +164,7 @@ describe('openweather-uv', function () {
   });
 
 
-  /** RequestType test */
+  /** UVRequestType test */
   describe('UVRequestType enum', function () {
     describe('#getName()', function () {
       it('should return current', function () {

@@ -2,6 +2,7 @@ const url = require('url');
 const nock = require('nock');
 const assert = require('assert');
 const weather = require('../src/openweather-weather');
+const InvalidRequestType = require('../src/openweather-base').InvalidRequestType;
 
 const source = nock('http://api.weathermap.org/data/2.5/')
   .get('/weather?')
@@ -200,7 +201,7 @@ describe('openweather-weather', function () {
       });
 
       it('should have the right forecast weather data endpoint', function () {
-        const req = weather.forecast();
+        const req = weather.forecast5();
         const urlObj = url.parse(req.url(), true);
         assert.strictEqual(urlObj.hostname, 'api.openweathermap.org');
         assert.strictEqual(urlObj.pathname, '/data/2.5/forecast');
@@ -229,12 +230,12 @@ describe('openweather-weather', function () {
       it('should have the specified geo coords and other params', function () {
         const latValue = 26.301741;
         const lonValue = -98.163338;
-        const req = weather.forecast()
+        const req = weather.forecast16()
           .appid('111')
           .coords(latValue, lonValue);
         const urlObj = url.parse(req.url(), true);
         assert.strictEqual(urlObj.hostname, 'api.openweathermap.org');
-        assert.strictEqual(urlObj.pathname, '/data/2.5/forecast');
+        assert.strictEqual(urlObj.pathname, '/data/2.5/forecast/daily');
         assert.deepEqual(urlObj.query, {
           mode: 'json',
           APPID: '111',
@@ -253,23 +254,27 @@ describe('openweather-weather', function () {
   });
 
 
-
-  /** Test forecast() factory function. */
-  describe('#forecast()', function () {
-    it('should return a WeatherRequest of request type FORECAST', function () {
-      const req = weather.forecast();
-      assert.strictEqual(req.type(), weather.WeatherRequestType.FORECAST);
+  /** Test factory functions below */
+  describe('#forecast5()', function () {
+    it('should return a WeatherRequest of request type FORECAST_5', function () {
+      const req = weather.forecast5();
+      assert.strictEqual(req.type(), weather.WeatherRequestType.FORECAST_5);
     });
   });
 
-  /** Test current() factory function. */
+  describe('#forecast16()', function () {
+    it('should return a WeatherRequest of request type FORECAST', function () {
+      const req = weather.forecast16();
+      assert.strictEqual(req.type(), weather.WeatherRequestType.FORECAST_16);
+    });
+  });
+
   describe('#current()', function () {
     it('should return a WeatherRequest of request type CURRENT', function () {
       const req = weather.current();
       assert.strictEqual(req.type(), weather.WeatherRequestType.CURRENT);
     });
   });
-
 
 
   /** Test the default key for weather requests are set. */
@@ -303,8 +308,7 @@ describe('openweather-weather', function () {
   });
 
 
-
-  // temperature unit tests
+  /** TemperatureUnit tests */
   describe('TemperatureUnit Enum', function () {
     describe('#getName()', function () {
       it('should return metric', function () {
@@ -321,13 +325,14 @@ describe('openweather-weather', function () {
 
       it('should return imperial', function () {
         const imperial = weather.TemperatureUnit.IMPERIAL;
-        const name = weather.TemperatureUnit.getName(imperial)
+        const name = weather.TemperatureUnit.getName(imperial);
         assert.strictEqual(name, 'imperial');
       });
     });
   });
 
-  /** RequestType test */
+
+  /** WeatherRequestType test */
   describe('WeatherRequestType Enum', function () {
     describe('#getName()', function () {
       it('should return current', function () {
@@ -350,7 +355,7 @@ describe('openweather-weather', function () {
 
       it('should throw an InvalidRequestType', function () {
         const other = null; // dummy value
-        const func = () => uv.UVRequestType.getName(other);
+        const func = () => weather.WeatherRequestType.getName(other);
         assert.throws(func, InvalidRequestType, 'Unknown UVRequestType');
       });
     });

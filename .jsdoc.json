@@ -12,6 +12,8 @@
     "dictionaries": ["jsdoc","closure"]
   },
   "templates": {
+    "referenceTitle":  "OpenWeather Reference",
+    "disabledSort": true,
     "cleverLinks": true,
     "monospaceLinks": true,
     "useLongnameInNav": false,
@@ -21,7 +23,8 @@
     "destination": "./docs/",
     "encoding": "utf8",
     "private": false,
-    "recurse": true
+    "recurse": true,
+    "template": "./node_modules/jsdoc-template"
   }
 }
 
