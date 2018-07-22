@@ -1,16 +1,9 @@
-const url = require('url');
 const nock = require('nock');
+
+const url = require('url');
 const assert = require('assert');
-const weather = require('../src/openweather-weather');
-const InvalidRequestType = require('../src/openweather-base').InvalidRequestType;
-
-const source = nock('http://api.weathermap.org/data/2.5/')
-  .get('/weather?')
-  .reply(200, {
-    text: 'yay',
-    id: '123ABC',
-  });
-
+const weather = require('../src/openweather').weather;
+const InvalidRequestType = require('../src/openweather').InvalidRequestType;
 
 describe('openweather-weather', function () {
 
@@ -250,6 +243,46 @@ describe('openweather-weather', function () {
     // TODO(la): use nock to mock HTTP requests
     // (https://scotch.io/tutorials/nodejs-tests-mocking-http-requests)
     describe('#exec()', function () {
+      const returnValue = { body: 'success!' };
+      afterEach(function () {
+        //nock.cleanAll();
+      });
+
+      it('send an API request to the CURRENT endpoint', function () {
+        const params = {
+          mode: 'json',
+          APPID: 'API-KEY',
+          lang: 'es',
+          units: 'imperial',
+          q: 'Austin',
+        };
+
+        // http://api.openweathermap.org/data/2.5/weather
+        nock('http://api.openweathermap.org')
+          .get('/data/2.5/weather')
+          .query(true)
+          .reply(200, returnValue);
+        //.query(params)
+
+        const req = weather.current()
+          .city('Austin')
+          .appid('API-KEY')
+          .language('es')
+          .units(weather.TemperatureUnit.IMPERIAL);
+
+        /**
+         * { body: 'success!' }
+         * http://api.openweathermap.org/data/2.5/weather?mode=json&APPID=API-KEY&lang=es&units=imperial&q=Austin
+         */
+
+        assert.doesNotReject(req.exec().then(value => {
+          console.log('value was received', value);
+          assert.strictEqual(value, returnValue.body);
+          assert.ok(nock.isDone());
+        }).catch(err => {
+          console.log('err was caught', err);
+        }));
+      });
     });
   });
 

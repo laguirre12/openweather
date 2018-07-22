@@ -196,15 +196,22 @@ class WeatherRequest {
     params.append('APPID', this.appid_);
 
     // optional for requests
-    if (this.limit_) params.append('cnt', this.limit_);
-    if (this.units_) params.append('units', TemperatureUnit.getName(this.units_));
-    if (this.city_) params.append('q', `${this.city_},${this.country_}`);
-    if (this.zip_) params.append('zip', `${this.zip_},${this.country_}`);
-    if (this.id_) params.append('id', this.id_);
+    if (this.id_)       params.append('id', this.id_);
+    if (this.zip_)      params.append('zip', `${this.zip_},${this.country_}`);
+    if (this.limit_)    params.append('cnt', this.limit_);
     if (this.language_) params.append('lang', this.language_);
+    if (this.units_)    params.append('units', TemperatureUnit.getName(this.units_));
     if (this.lat_ && this.lon_) {
       params.append('lat', this.lat_);
       params.append('lon', this.lon_);
+    }
+
+    // TODO(la): clean this up
+    if (this.city_) {
+      let value = `${this.city_}`;
+      if (this.country_)
+        value += `,${this.country_}`;
+      params.append('q', value);
     }
     return requestUrl.href;
   }
@@ -279,7 +286,7 @@ class WeatherRequest {
   city(name, country) {
     if (!arguments.length) return { city: this.city_, country: this.country_ };
     this.city_ = name;
-    this.country_ = country || this.country_;
+    this.country_ = country;
     return this;
   }
 
@@ -349,13 +356,18 @@ class WeatherRequest {
    * with a possible error and the API response
    * @returns {Promise} A promise representing the result of the request
    */
+  // TODO(la): fix asynchronous support for both callback and promises
   exec(callback) {
     const url = this.url();
-    callback = callback || (() => {});
-    return got(url)
+    callback = callback || ((val, err) => {
+      return (val, err);
+    });
+    return got(url, { json: true })
       .then(res => res.body)
-      .then(res => callback(null, res))
-      .catch(err => callback(err));
+      .then(res => callback(res))
+      .catch(err => {
+        return callback(null, err)
+      });
   }
 }
 

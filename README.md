@@ -34,9 +34,9 @@ For more information on installing a dependency directly from a github repo, ref
 * `test`: runs the test suite
 
 ## Overview
-This is a set of modules meant to interact with various OpenWeather APIs. Each module is meant to cover related Openweather API endpoints and consists of a Request Class, Enums for specific API endpoints (and possible units), and factory methods for creating new Requests. Each Request Class has a fluent interface with chainable setters/getters that set specific properties for the request and an `exec()` method that executes the request. The `exec()` functions support both Promises and callbacks. In order to send requests each Request must be given an API-KEY (`appid`) , which can be set globally for the module.
+This is a set of modules meant to interact with various OpenWeather APIs. Each module is meant to cover related Openweather API endpoints and consists of a Request Class, Enums for specific API endpoints (and possible units), and factory methods for creating new Requests. Each Request Class has a fluent interface with chainable setters/getters that set specific properties for the request and an `exec()` method that executes the request. The `exec()` functions support both Promises and Callbacks. In order to send requests each Request must be given an API-KEY (`appid`) , which can be set globally for the module.
 
-As of now, these modules only allow for the response format to be in JSON.
+As of now, these modules only allow for the response format to be in JSON, and all modules are bundled together into a single import `openweather` (refer to code examples for more detail).
 
 Overview of each module:
 
@@ -48,9 +48,11 @@ Overview of each module:
 
 * `openweather-weather.js`: A module for interacting with the [Openweather Current Weather API](https://openweathermap.org/current), [OpenWeather 5 day/3 hour Forecast API](https://openweathermap.org/forecast5), and the [OpenWeather 16 day Forecast API](https://openweathermap.org/forecast16). These three API's are grouped together because they have similar request parameters. The module consists of a `WeatherRequest` class, `WeatherRequestType`'s to specify which endpoint is called, and factory functions to create new `WeatherRequest`'s.
 
+* `openweather.js`: A module that exports all openweather modules into a single module.
+
 
 ## OpenWeather-uv
-    const uv = require('openweather-uv');
+    const uv = require('openweather).uv;
     uv.defaultKey('<API-KEY>');
 
     const req = uv.current()
@@ -111,7 +113,7 @@ Overview of each module:
 
 
 ## Openweather-air
-    const air = require('openweather-air');
+    const air = require('openweather').air;
     air.defaultKey('<API-KEY>');
 
     // a request to the Air pollution data API for the ozone endpoint
@@ -166,7 +168,7 @@ Overview of each module:
 
 
 ## Openweather-weather
-    const weather = require('openweather-weather');
+    const weather = require('openweather').weather;
     weather.defaultKey('<API-KEY>');
 
     // a request to the free Weather Forecast with the default API key
@@ -230,4 +232,3 @@ For a more complete overview of each of these modules, you can consult the JSDoc
 4. links to tables are not rendered correctly on github
 5. code coverage reports
 6. github badges
-7. update code samples to show proper way to import

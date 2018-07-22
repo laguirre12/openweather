@@ -118,7 +118,7 @@ class AirRequest {
    * @param {Object} [config] A configuration object for the request
    */
   constructor(config) {
-    if (config === null || typeof config!== 'object') {
+    if (config === null || typeof config !== 'object') {
       config = {};
     }
     this.appid_ = config.appid || APPID;
@@ -225,8 +225,8 @@ class AirRequest {
     callback = callback || (() => {});
     return got(url)
       .then(res => res.body)
-      .then(res => callback(null, res))
-      .catch(err => callback(err));
+      .then(res => callback(res))
+      .catch(err => callback(null, err));
   }
 }
 

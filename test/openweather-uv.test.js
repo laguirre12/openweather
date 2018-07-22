@@ -1,9 +1,9 @@
-const url = require('url');
 const nock = require('nock');
-const assert = require('assert');
 
-const uv = require('../src/openweather-uv');
-const InvalidRequestType = require('../src/openweather-base').InvalidRequestType;
+const url = require('url');
+const assert = require('assert');
+const uv = require('../src/openweather').uv;
+const InvalidRequestType = require('../src/openweather').InvalidRequestType;
 
 describe('openweather-uv', function () {
 
