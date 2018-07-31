@@ -3,6 +3,9 @@
  * beta). Reference can be found at: {@link https://openweathermap.org/api/uvi}
  * @module openweather-uv
  * @author laguirre <aguirreluis1234@gmail.com>
+ * @example
+ * // require the openweather-uv module
+ * const uv = require('openweather').uv;
  */
 
 const got = require('got');
@@ -59,11 +62,11 @@ const base = 'http://api.openweathermap.org/data/2.5/uvi';
  * Map of url's for each endpoint covered in this module.
  * @private
  */
-const BaseUrl = {};
-BaseUrl[UVRequestType.CURRENT] = base + '';
-BaseUrl[UVRequestType.HISTORY] = base + '/history';
-BaseUrl[UVRequestType.FORECAST] = base + '/forecast';
-Object.freeze(BaseUrl);
+const baseUrl = {};
+baseUrl[UVRequestType.CURRENT] = base + '';
+baseUrl[UVRequestType.HISTORY] = base + '/history';
+baseUrl[UVRequestType.FORECAST] = base + '/forecast';
+Object.freeze(baseUrl);
 
 //--------------------------------------------------------------------
 // Request classes
@@ -77,36 +80,37 @@ Object.freeze(BaseUrl);
  * @implements {OpenWeatherRequest}
  * @example
  * // creates a new UVRequest with no properties set
- * const req = new UVRequest();
+ * const req = new uv.UVRequest();
  * @example
  * // creates a new UVRequest for the current data endpoint
- * // the UVRequest has all properties used by the current data endpoin
- * const req = new UVRequest({
+ * // the UVRequest has all properties used by the current data endpoint
+ * const req = new uv.UVRequest({
  *   appid: 'API-KEY',
- *   type: UVRequestType.CURRENT,  // either CURRENT, HISTORY, or FORECAST
- *   lat: 100.113,                 // Requests to the UV index API must use
- *   lon: 55.166,                  //  geo coordinates
- * });
- * @example
- * // creates a new UVRequest for the history data endpoint
- * // the UVRequest has all properties used in the history data endpoint
- * const req = new UVRequest({
- *   appid: 'API-KEY',
- *   type: UVRequestType.HISTORY,
- *   lat: 100.113,
- *   lon: 55.166,
- *   start: '',        // starting and ending point of timeperiod - Only used by
- *   end: ''           // the HISTORY data endpoint
+ *   type: uv.UVRequestType.CURRENT,
+ *   lat: 100.113,                   // Requests to the UV index API must use
+ *   lon: 55.166,                    //  geo coordinates
  * });
  * @example
  * // creates a new UVRequest for the forecast data endpoint
- * // the UVRequest has all properties used in the request
- * const req = new UVRequest({
+ * // Forecast requests additionaly allow for a `limit` parameter
+ * const req = new uv.UVRequest({
  *   appid: 'API-KEY',
- *   type: UVRequestType.FORECAST,
+ *   type: uv.UVRequestType.FORECAST,
  *   lat: 100.113,
  *   lon: 55.166,
- *   limit: 3, // number of days in response - used only by FORECAST endpoint
+ *   limit: 3               // number of days in response
+ * });
+ * @example
+ * // creates a new UVRequest for the history data endpoint
+ * // History requests additionally allow for `start`, `end`, and `limit` parameters
+ * const req = new uv.UVRequest({
+ *   appid: 'API-KEY',
+ *   type: uv.UVRequestType.HISTORY,
+ *   lat: 100.113,
+ *   lon: 55.166,
+ *   limit: 10,             // number of days in response
+ *   start: '1498049953',   // starting and ending point of timeperiod
+ *   end: '1498481991'
  * });
  */
 class UVRequest {
@@ -126,7 +130,7 @@ class UVRequest {
     this.lat_ = config.lat;
     this.lon_ = config.lon;
 
-    this.cnt_ = config.cnt;
+    this.limit_ = config.limit;
 
     this.start_ = config.start;
     this.end_ = config.end;
@@ -183,8 +187,8 @@ class UVRequest {
    * no parameters are passed, otherwise this
    */
   limit(count) {
-    if (!arguments.length) return this.count_;
-    this.count_ = count;
+    if (!arguments.length) return this.limit_;
+    this.limit_ = count;
     return this;
   }
 
@@ -211,15 +215,15 @@ class UVRequest {
    * @returns {string} the url that corresponds to this request.
    */
   url() {
-    const requestUrl = new url.URL(BaseUrl[this.type_]);
+    const requestUrl = new url.URL(baseUrl[this.type_]);
     const params = requestUrl.searchParams;
     params.append('APPID', this.appid_);
     params.append('lat', this.lat_);
     params.append('lon', this.lon_);
 
     // only used for the 'forecast' endpoint
-    if (this.type_ === UVRequestType.FORECAST) {
-      params.append('cnt', this.cnt_);
+    if (this.type_ !== UVRequestType.CURRENT) {
+      params.append('limit', this.limit_);
     }
 
     // only used for the 'historical' endpoint'
@@ -240,10 +244,17 @@ class UVRequest {
   exec(callback) {
     const url = this.url();
     callback = callback || (() => {});
-    return got(url)
-      .then(res => res.body)
-      .then(res => callback(res))
-      .catch(err => callback(null, err));
+    return new Promise(function(resolve, reject) {
+      got(url, { json : true })
+        .then(res => {
+          resolve(res.body);
+          callback(null, res.body);
+        })
+        .catch(err => {
+          reject(err);
+          callback(err);
+        });
+    });
   }
 }
 

@@ -10,6 +10,9 @@
  * available as JSON
  * @module openweather-air
  * @author laguirre <aguirreluis1234@gmail.com>
+ * @example
+ * // require the openweather-air module
+ * const air = require('openweather').air;
  */
 
 const got = require('got');
@@ -75,12 +78,12 @@ const base = 'http://api.openweathermap.org/pollution/v1/';
  * Map of url's for each endpoint covered in this module.
  * @private
  */
-const BaseUrl = {};
-BaseUrl[AirRequestType.CO] = base + 'co';
-BaseUrl[AirRequestType.O3] = base + 'o3';
-BaseUrl[AirRequestType.CO2] = base + 'so2';
-BaseUrl[AirRequestType.NO2] = base + 'no2';
-Object.freeze(BaseUrl);
+const baseUrl = {};
+baseUrl[AirRequestType.CO] = base + 'co';
+baseUrl[AirRequestType.O3] = base + 'o3';
+baseUrl[AirRequestType.SO2] = base + 'so2';
+baseUrl[AirRequestType.NO2] = base + 'no2';
+Object.freeze(baseUrl);
 
 //--------------------------------------------------------------------
 // Request classes
@@ -149,7 +152,7 @@ class AirRequest {
    */
   url() {
     const input = `/${this.lat_},${this.lon_}/${this.datetime_}.json?appid=${this.appid_}`;
-    const requestUrl = encodeURI(BaseUrl[this.type_] + input);
+    const requestUrl = encodeURI(baseUrl[this.type_] + input);
     return requestUrl;
   }
 
@@ -223,10 +226,17 @@ class AirRequest {
   exec(callback) {
     const url = this.url();
     callback = callback || (() => {});
-    return got(url)
-      .then(res => res.body)
-      .then(res => callback(res))
-      .catch(err => callback(null, err));
+    return new Promise(function(resolve, reject) {
+      got(url, { json : true })
+        .then(res => {
+          resolve(res.body);
+          callback(null, res.body);
+        })
+        .catch(err => {
+          reject(err);
+          callback(err);
+        });
+    });
   }
 }
 

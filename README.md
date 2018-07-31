@@ -3,20 +3,9 @@
 [Install](#install)<br/>
 [NPM Scripts](#npm-scripts)<br/>
 [Overview](#overview)<br/>
-[OpenWeather-UV](#openweather\-uv)
-  - [UVRequest methods](#uvrequest-methods:)
-  - [UVRequestType's](#uvrequesttype's:)
-  - [Other Openweather-uv Functions](#other-openweather\-uv-functions:)
-
-[OpenWeather-Air](#openweather\-air)
-  - [AirRequest methods](#airrequest-methods:)
-  - [AirRequestType's](#airrequesttype's:)
-  - [Other Openweather-air Functions](#other-openweather\-air-functions:)
-
+[OpenWeather-UV](#openweather\-uv)<br/>
+[OpenWeather-Air](#openweather\-air)<br/>
 [OpenWeather-Weather](#openweather\-weather)
-  - [WeatherRequest methods](#weatherrequest-methods:)
-  - [WeatherRequestType's](#weatherrequesttype's:)
-  - [Other Openweather-weather Functions](#other-openweather\-weather-functions:)
 
 ## Install
 Install this project directly from this repository with npm by running one of the following commands:
@@ -38,7 +27,9 @@ This is a set of modules meant to interact with various OpenWeather APIs. Each m
 
 As of now, these modules only allow for the response format to be in JSON, and all modules are bundled together into a single import `openweather` (refer to code examples for more detail).
 
-Overview of each module:
+Overview of each file:
+
+* `openweather.js`: A module that wraps the other openweather modules into one.
 
 * `openweather-base.js`: A module containing a general interface for any OpenWeather API requests and request types, and a custom Error types that are used in the following modules. (NOTE: the interfaces are only described via JSDoc virtual comments)
 
@@ -48,18 +39,15 @@ Overview of each module:
 
 * `openweather-weather.js`: A module for interacting with the [Openweather Current Weather API](https://openweathermap.org/current), [OpenWeather 5 day/3 hour Forecast API](https://openweathermap.org/forecast5), and the [OpenWeather 16 day Forecast API](https://openweathermap.org/forecast16). These three API's are grouped together because they have similar request parameters. The module consists of a `WeatherRequest` class, `WeatherRequestType`'s to specify which endpoint is called, and factory functions to create new `WeatherRequest`'s.
 
-* `openweather.js`: A module that exports all openweather modules into a single module.
-
-
 ## OpenWeather-uv
-    const uv = require('openweather).uv;
+    const uv = require('openweather').uv;
     uv.defaultKey('<API-KEY>');
 
     const req = uv.current()
                   .coords(101.133, 55.166);
 
-    console.log(req.appid());   // prints `<API-KEY>`
-    console.log(req.coords());  // prints `{ lat: 101.133, lon: 55.166 }`
+    console.log(req.appid());   // `<API-KEY>`
+    console.log(req.coords());  // `{ lat: 101.133, lon: 55.166 }`
     console.log(req.url());     // string URL associated with the API request
 
     // execute the request using a Promise
@@ -80,7 +68,7 @@ Overview of each module:
       console.log(data);
     });
 
-### UVRequest methods:
+#### UVRequest methods:
 
 |   method   |   params    |  description  |
 | ---------  |   ------    | ------------- |
@@ -92,7 +80,7 @@ Overview of each module:
 | exec       | callback    | executes the API request |
 | url        | ----------- | generates the URL associated with this request |
 
-### UVRequestType's:
+#### UVRequestType's:
 
 | UVRequestType | description |
 | -------- | ----------- |
@@ -100,7 +88,7 @@ Overview of each module:
 | HISTORY  | used to specify a UVRequest is for the history data endpoint |
 | FORECAST | used to specify a UVRequest is for the forecast data endpoint |
 
-### Other Openweather-uv functions:
+#### Other Openweather-uv functions:
 
 | function | params | description |
 | -------- | ------ | ----------- |
@@ -134,7 +122,7 @@ Overview of each module:
         console.log(err);
       });
 
-### AirRequest methods:
+#### AirRequest methods:
 
 |  method  |    params   | description  |
 | -------- | ----------- |------------- |
@@ -145,7 +133,7 @@ Overview of each module:
 | exec     | callback    | executes the API request |
 | url      | ----------- | generates the URL associated with this request |
 
-### AirRequestType's:
+#### AirRequestType's:
 
 | AirRequestType | description |
 | -------- | ----------- |
@@ -154,7 +142,7 @@ Overview of each module:
 | SO2 | used to specify a AirRequest is for the sulfur-dioxide data endpoint |
 | NO2 | used to specify a AirRequest is for the nitroge-dioxide data endpoint |
 
-### Other Openweather-air functions:
+#### Other Openweather-air functions:
 
 | function        | params | description |
 | --------------- | ------ | ----------- |
@@ -162,7 +150,7 @@ Overview of each module:
 | carbonMonoxide  | ------ | creates an AirRequest for the carbon-monoxide endpoint |
 | sulfurDioxide   | ------ | creates an AirRequest for the sulfur-dioxide endpoint |
 | nitrogenDioxide | ------ | creates an AirRequest for the nitrogen-dioxide endpoint |
-| defaultKey      | appid  |sets a default API-KEY for all AirRequest's |
+| defaultKey      | appid  | sets a default API-KEY for all AirRequest's |
 
 
 
@@ -176,8 +164,8 @@ Overview of each module:
                        .city('Austin')
                        .units(weather.TemperatureUnit.METRIC); // for celsius
 
-    console.log(req.units());  // returns weather.TemperatureUnit.METRIC
-    console.log(req.city());   // returns 'Austin'
+    console.log(req.units());  // weather.TemperatureUnit.METRIC
+    console.log(req.city());   // 'Austin'
     console.log(req.url());    // the string URL corresponding to the API request
 
     // sends the request
@@ -189,7 +177,7 @@ Overview of each module:
         console.log(err);
       });
 
-### WeatherRequest methods:
+#### WeatherRequest methods:
 
 |  method  |     params    | description  |
 | -------- | ------------- |------------- |
@@ -205,7 +193,7 @@ Overview of each module:
 | exec     | callback      | executes the API request |
 | url      | --------      | generates the URL associated with this request  |
 
-### WeatherRequestType's:
+#### WeatherRequestType's:
 
 | WeatherRequestType | description |
 | ------------------ | ----------- |
@@ -213,10 +201,10 @@ Overview of each module:
 | FORECAST\_5   | used to specify a WeatherRequest is for a 3-hour interval 5 day forecast |
 | FORECAST\_16  | used to specify a WeatherRequest is for a 16 day forecast |
 
-### Other Openweather-weather functions:
+#### Other Openweather-weather functions:
 
 | function   | params | description |
-| -----------| ------ | ----------- |
+| ---------- | ------ | ----------- |
 | current    | ------ | creates a WeatherRequest for current weather data |
 | forecast5  | ------ | creates a WeatherRequest for a 5-day/3-hour interval forecast |
 | forecast16 | ------ | creates a WeatherRequest for 16-day forecast |
@@ -227,8 +215,5 @@ For a more complete overview of each of these modules, you can consult the JSDoc
 
 # TODOs
 0. make repo public
-2. Finish Testing
-3. provide description for each detailed section of the README
-4. links to tables are not rendered correctly on github
 5. code coverage reports
 6. github badges

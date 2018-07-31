@@ -1,30 +1,21 @@
-const nock = require('nock');
-
 const url = require('url');
+const nock = require('nock');
 const assert = require('assert');
 const air = require('../src/openweather').air;
 const InvalidRequestType = require('../src/openweather').InvalidRequestType;
 
 describe('openweather-air', function () {
-
   /** AirRequest Class tests */
   describe('#AirRequest', function () {
-    let req;
-    beforeEach(function () {
-      req = new air.AirRequest();
-    });
-
     describe('#constructor()', function () {
       it('should have default properties', function () {
-        req = new air.AirRequest();
+        const req = new air.AirRequest();
         assert.strictEqual(req.appid(), undefined);
         assert.strictEqual(req.type(), undefined);
         assert.deepStrictEqual(req.coords(), {
           lat: undefined,
           lon: undefined
         });
-        // TODO(la): how to predict the creation time?
-        // assert.strictEqual(req.datetime(), undefined);
       });
 
       it('should have all values set', function () {
@@ -35,7 +26,7 @@ describe('openweather-air', function () {
           lon: 55.166,
           datetime: (new Date()).toISOString()
         };
-        req = new air.AirRequest(config);
+        const req = new air.AirRequest(config);
         assert.strictEqual(req.appid(), config.appid);
         assert.strictEqual(req.type(), config.type);
         assert.strictEqual(req.datetime(), config.datetime);
@@ -47,14 +38,19 @@ describe('openweather-air', function () {
     });
 
     describe('#appid()', function () {
-      const key = '111';
+      const key = 'API-KEY';
       it('should set the', function () {
-        req.appid(key);
+        const req = (new air.AirRequest()).appid(key);
         assert.strictEqual(req.appid(), key);
       });
     });
 
     describe('#type()', function () {
+      let req;
+      beforeEach(function () {
+        req = new air.AirRequest();
+      });
+
       it('should set the RequestType to CO', function () {
         req.type(air.AirRequestType.CO);
         assert.strictEqual(req.type(), air.AirRequestType.CO);
@@ -80,7 +76,7 @@ describe('openweather-air', function () {
       const latValue = 26.301741;
       const lonValue = -98.163338;
       it('should set the longitude and latitude of the request', function () {
-        req.coords(latValue, lonValue);
+        const req = (new air.AirRequest()).coords(latValue, lonValue);
         assert.deepStrictEqual(req.coords(), {
           lat: latValue,
           lon: lonValue,
@@ -91,26 +87,82 @@ describe('openweather-air', function () {
     describe('#datetime()', function () {
       const datetime = '2016-01-02T15:04:05Z';
       it('should set the tiem', function () {
-        req.datetime(datetime);
+        const req = (new air.AirRequest()).datetime(datetime);
         assert.strictEqual(req.datetime(), datetime);
       });
     });
 
-    // TODO(la): extract the parameters from the url
     describe('#url()', function () {
+      const params = {
+        appid: 'API-KEY',
+        lat: 26.301741,
+        lon: -98.163338,
+        datetime: (new Date()).toISOString(),
+      };
+
+      it('should have the specified params for each endpoint', function () {
+        const endpoints = [
+          air.AirRequestType.CO,
+          air.AirRequestType.O3,
+          air.AirRequestType.SO2,
+          air.AirRequestType.NO2
+        ];
+        endpoints.forEach(e => {
+          const req = (new air.AirRequest())
+            .type(e)
+            .appid(params.appid)
+            .coords(params.lat, params.lon)
+            .datetime(params.datetime);
+          const urlObj = url.parse(req.url(), true);
+          assert.strictEqual(urlObj.hostname, 'api.openweathermap.org');
+          assert.strictEqual(urlObj.pathname, '/pollution/v1/'
+            + `${air.AirRequestType.getName(e)}/${params.lat},${params.lon}/${params.datetime}.json`);
+          assert.deepEqual(urlObj.query, { appid : params.appid });
+        });
+      });
     });
 
-    // TODO(la): use nock to mock HTTP requests
-    // (https://scotch.io/tutorials/nodejs-tests-mocking-http-requests)
     describe('#exec()', function () {
+      const returnValue = { status : 'success!' };
+      const params = {
+        appid: 'API-KEY',
+        lat: 26.301741,
+        lon: -98.163338,
+        datetime: (new Date()).toISOString(),
+      };
+
+      it('should send an API request to each endpoint', function () {
+        const endpoints = [
+          air.AirRequestType.CO,
+          air.AirRequestType.O3,
+          air.AirRequestType.SO2,
+          air.AirRequestType.NO2
+        ];
+        endpoints.forEach(e => {
+          const name = air.AirRequestType.getName(e);
+          nock('http://api.openweathermap.org')
+            .get(`/pollution/v1/${name}/${params.lat},${params.lon}/${params.datetime}.json`)
+            .query({ appid : params.appid })
+            .reply(200, returnValue);
+
+          const req = (new air.AirRequest())
+            .type(e)
+            .appid(params.appid)
+            .coords(params.lat, params.lon)
+            .datetime(params.datetime);
+
+          assert.doesNotReject(req.exec().then(value => {
+            assert.deepEqual(value, returnValue);
+          }));
+        });
+      });
     });
   });
 
 
-
   /** Default Key tests below */
   describe('#defaultKey()', function () {
-    const defaultKey = '111';
+    const defaultKey = 'API-KEY';
     beforeEach(function () {
       air.defaultKey(defaultKey);
     });

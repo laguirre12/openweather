@@ -6,6 +6,9 @@
  * forecast API ({@link https://openweathermap.org/forecast16}).
  * @module openweather-weather
  * @author laguirre <aguirreluis1234@gmail.com>
+ * @example
+ * // require the openweather-weather module
+ * const weather = require('openweather').weather;
  */
 
 const got = require('got');
@@ -107,11 +110,11 @@ const base = 'http://api.openweathermap.org/data/2.5/';
  * Map of base URL's for each OpenWeather API.
  * @private
  */
-const BaseUrl = {};
-BaseUrl[WeatherRequestType.CURRENT] = base  + 'weather';
-BaseUrl[WeatherRequestType.FORECAST_5] = base + 'forecast';
-BaseUrl[WeatherRequestType.FORECAST_16] = base + 'forecast/daily';
-Object.freeze(BaseUrl);
+const baseUrl = {};
+baseUrl[WeatherRequestType.CURRENT] = base  + 'weather';
+baseUrl[WeatherRequestType.FORECAST_5] = base + 'forecast';
+baseUrl[WeatherRequestType.FORECAST_16] = base + 'forecast/daily';
+Object.freeze(baseUrl);
 
 //--------------------------------------------------------------------
 // Request class
@@ -131,29 +134,29 @@ Object.freeze(BaseUrl);
  * @implements {OpenWeatherRequest}
  * @example
  * // creates a new request with no properties set
- * const req = new WeatherRequest();
+ * const req = new weather.WeatherRequest();
  * req.appid('API-KEY')
- *    .type(WeatherRequestType.CURRENT)
+ *    .type(weather.WeatherRequestType.CURRENT)
  *    .city('Austin')
  *    .language('en');
  * @example
  * // constructs a new request with all properties used in the request
- * const req = new WeatherRequest({
- *   appid: 'API-KEY',
- *   type: WeatherRequestType.CURRENT, // CURRENT, FORECAST_5, or FORECAST_16
- *   id: 'city-id',                    // id of city to search for
- *   zip: '11111',                     // zip code of the city
- *   city: 'Austin',                   // city name
- *   country: 'us',                    // country code
- *   lat: 100.113,                     // geo. coordinates of the request
+ * const req = new weather.WeatherRequest({
+ *   appid: 'API-KEY',                         // your API-KEY
+ *   type: weather.WeatherRequestType.CURRENT, // CURRENT, FORECAST_5, or FORECAST_16
+ *   id: 'city-id',                            // id of city to search for
+ *   zip: '11111',                             // zip code of the city
+ *   city: 'Austin',                           // city name
+ *   country: 'us',                            // country code (used with either zip or city)
+ *   lat: 100.113,                             // geo. coordinates of the request
  *   lon: 55.166,
- *   limit: 3,                         // limit on number of results
- *   units: TemperatureUnit.STANDARD,  // which units temperature should be in
- *   language: 'en'                    // language for weather description
+ *   limit: 3,                                 // limit on number of results
+ *   units: weather.TemperatureUnit.STANDARD,  // which units temperature should be in
+ *   language: 'en'                            // language for weather description
  * });
  *
  * req.key() === 'API-KEY';
- * req.type() === WeatherRequestType.CURRENT;
+ * req.type() === weather.WeatherRequestType.CURRENT;
  *
  * // NOTE: you only need one of: city id, city name & country, zip & country,
  * // or geo. coordinates for the request
@@ -188,7 +191,7 @@ class WeatherRequest {
    * @returns {string} The url that corresponds to the API request
    */
   url() {
-    const requestUrl = new url.URL(BaseUrl[this.type_]);
+    const requestUrl = new url.URL(baseUrl[this.type_]);
     const params = requestUrl.searchParams;
 
     // necessary for request
@@ -197,7 +200,6 @@ class WeatherRequest {
 
     // optional for requests
     if (this.id_)       params.append('id', this.id_);
-    if (this.zip_)      params.append('zip', `${this.zip_},${this.country_}`);
     if (this.limit_)    params.append('cnt', this.limit_);
     if (this.language_) params.append('lang', this.language_);
     if (this.units_)    params.append('units', TemperatureUnit.getName(this.units_));
@@ -206,12 +208,14 @@ class WeatherRequest {
       params.append('lon', this.lon_);
     }
 
-    // TODO(la): clean this up
     if (this.city_) {
-      let value = `${this.city_}`;
-      if (this.country_)
-        value += `,${this.country_}`;
+      let value = `${this.city_}${this.country_ ? ',' + this.country_ : ''}`;
       params.append('q', value);
+    }
+
+    if (this.zip_) {
+      let value = `${this.zip_}${this.country_ ? ',' + this.country_ : ''}`;
+      params.append('zip', value);
     }
     return requestUrl.href;
   }
@@ -356,18 +360,20 @@ class WeatherRequest {
    * with a possible error and the API response
    * @returns {Promise} A promise representing the result of the request
    */
-  // TODO(la): fix asynchronous support for both callback and promises
   exec(callback) {
     const url = this.url();
-    callback = callback || ((val, err) => {
-      return (val, err);
+    callback = callback || (() => {});
+    return new Promise(function (resolve, reject) {
+      got(url, { json : true })
+        .then(res => {
+          resolve(res.body);
+          callback(null, res.body);
+        })
+        .catch(err => {
+          reject(err);
+          callback(err);
+        });
     });
-    return got(url, { json: true })
-      .then(res => res.body)
-      .then(res => callback(res))
-      .catch(err => {
-        return callback(null, err)
-      });
   }
 }
 
