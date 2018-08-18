@@ -1,6 +1,6 @@
 {
   "name": "openweather",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A set of modules for interacting with various OpenWeather API's",
   "main": "src/openweather.js",
   "scripts": {

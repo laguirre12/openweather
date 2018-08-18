@@ -212,8 +212,3 @@ Overview of each file:
 
 
 For a more complete overview of each of these modules, you can consult the JSDoc.
-
-# TODOs
-0. make repo public
-5. code coverage reports
-6. github badges
