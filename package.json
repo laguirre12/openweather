@@ -1,7 +1,7 @@
 {
   "name": "openweather",
   "version": "1.0.0",
-  "description": "A set of modules for interacting with various OpenWeather API's",
+  "description": "A set of modules for interacting with various OpenWeatherMap API's",
   "main": "src/openweather.js",
   "scripts": {
     "doc": "jsdoc src --configure .jsdoc.json --verbose",
@@ -24,8 +24,10 @@
     "nock": "^9.4.3"
   },
   "keywords": [
-    "Weather",
-    "OpenWeather"
+    "weather",
+    "OpenWeatherMap.org",
+    "weather-api",
+    "api"
   ],
   "repository": {
     "type": "git",
