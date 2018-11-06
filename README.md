@@ -46,8 +46,8 @@ Overview of each file:
     const req = uv.current()
                   .coords(101.133, 55.166);
 
-    console.log(req.appid());   // `<API-KEY>`
-    console.log(req.coords());  // `{ lat: 101.133, lon: 55.166 }`
+    console.log(req.appid());   // '<API-KEY>'
+    console.log(req.coords());  // '{ lat: 101.133, lon: 55.166 }'
     console.log(req.url());     // string URL associated with the API request
 
     // execute the request using a Promise
@@ -106,11 +106,12 @@ Overview of each file:
 
     // a request to the Air pollution data API for the ozone endpoint
     const req = air.ozone()
-                   .appid('<Another API-KEY>') // override default key
+                   .appid('<ANOTHER-API-KEY>') // override default key
                    .coords(101.133, 55.166)
                    .datetime(new Date());
 
-    console.log(req.coords()); // returns { lat: 101.133, lon: 55.166}
+    console.log(req.appid());  // '<ANOTHER-API-KEY>'
+    console.log(req.coords()); // '{ lat: 101.133, lon: 55.166 }'
     console.log(req.url());    // string URL associated with the API request
 
     // sends the request
@@ -160,12 +161,12 @@ Overview of each file:
     weather.defaultKey('<API-KEY>');
 
     // a request to the free Weather Forecast with the default API key
-    const req = weather.forecast()
+    const req = weather.current()
                        .city('Austin')
                        .units(weather.TemperatureUnit.METRIC); // for celsius
 
-    console.log(req.units());  // weather.TemperatureUnit.METRIC
-    console.log(req.city());   // 'Austin'
+    console.log(req.appid());  // '<API-KEY>'
+    console.log(req.city());   // '{ city: 'Austin', country: undefined }'
     console.log(req.url());    // the string URL corresponding to the API request
 
     // sends the request
