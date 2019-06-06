@@ -209,12 +209,12 @@ class WeatherRequest {
     }
 
     if (this.city_) {
-      let value = `${this.city_}${this.country_ ? ',' + this.country_ : ''}`;
+      const value = `${this.city_}${this.country_ ? ',' + this.country_ : ''}`;
       params.append('q', value);
     }
 
     if (this.zip_) {
-      let value = `${this.zip_}${this.country_ ? ',' + this.country_ : ''}`;
+      const value = `${this.zip_}${this.country_ ? ',' + this.country_ : ''}`;
       params.append('zip', value);
     }
     return requestUrl.href;

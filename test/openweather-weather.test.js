@@ -214,7 +214,7 @@ describe('openweather-weather', function () {
         assert.deepEqual(urlObj.query, params);
       });
 
-      it('should have the specified params for the 5 day forecast', function() {
+      it('should have the specified params for the 5 day forecast', function () {
         const req = weather.forecast5()
           .appid(params.APPID)
           .city(params.q)
