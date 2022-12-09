@@ -42,7 +42,7 @@ Overview of each module:
 
 For more information, refer to generated the API documentation.
 
-![API Documentation](../docs/openweather-doc.png)
+![API Documentation](./docs/openweather-doc.png)
 
 ## OpenWeather-uv
 
