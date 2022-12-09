@@ -15,8 +15,8 @@
  * const air = require('openweather').air;
  */
 
-const got = require('got');
-const InvalidRequestType = require('./openweather-base').InvalidRequestType;
+import got from 'got';
+import { InvalidRequestType } from './openweather-base.js';
 
 let APPID; // global references to API_KEY
 
@@ -39,7 +39,7 @@ let APPID; // global references to API_KEY
  * @property {symbol(string)} NO2 the nitrogen-dioxide data endpoint
  * ({@link https://openweathermap.org/api/pollution/no2})
  */
-const AirRequestType = Object.freeze({
+export const AirRequestType = Object.freeze({
   O3: Symbol('o3'),
   CO: Symbol('co'),
   SO2: Symbol('so2'),
@@ -108,7 +108,7 @@ Object.freeze(baseUrl);
  *   datetime: new Date().toISOString  // an ISO time string
  * });
  */
-class AirRequest {
+export class AirRequest {
   /**
    * Constructs a AirRequest object, takes an optional configuration
    * object to specify default properties of the request. AirRequest have
@@ -260,7 +260,7 @@ function defaultKey(appid) {
  * The AirRequest will have the 'O3' RequestType.
  * @returns {AirRequest} A generic request for the ozone air pollution API
  */
-function ozone() {
+export function ozone() {
   return new AirRequest().type(AirRequestType.O3);
 }
 
@@ -269,7 +269,7 @@ function ozone() {
  * endpoint. The AirRequest will have the 'CO' RequestType.
  * @returns {AirRequest} A generic request for the 'CO' air pollution API
  */
-function carbonMonoxide() {
+export function carbonMonoxide() {
   return new AirRequest().type(AirRequestType.CO);
 }
 
@@ -279,7 +279,7 @@ function carbonMonoxide() {
  * RequestType.
  * @returns {AirRequest} A generic request for the 'SO2' air pollution API
  */
-function sulfurDioxide() {
+export function sulfurDioxide() {
   return new AirRequest().type(AirRequestType.SO2);
 }
 
@@ -289,22 +289,6 @@ function sulfurDioxide() {
  * RequestType.
  * @returns {AirRequest} A generic request for the 'NO2' air pollution API
  */
-function nitrogenDioxide() {
+export function nitrogenDioxide() {
   return new AirRequest().type(AirRequestType.NO2);
 }
-
-
-//--------------------------------------------------------------------
-// Exports
-//--------------------------------------------------------------------
-
-module.exports = {
-  ozone: ozone,
-  sulfurDioxide: sulfurDioxide,
-  carbonMonoxide: carbonMonoxide,
-  nitrogenDioxide: nitrogenDioxide,
-  defaultKey: defaultKey,
-
-  AirRequest: AirRequest,
-  AirRequestType:AirRequestType,
-};

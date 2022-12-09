@@ -1,8 +1,7 @@
-const url = require('url');
-const nock = require('nock');
-const assert = require('assert');
-const uv = require('../src/openweather').uv;
-const InvalidRequestType = require('../src/openweather').InvalidRequestType;
+import url from 'node:url';
+import assert from 'node:assert';
+import nock from 'nock';
+import { uv, InvalidRequestType } from '../src/openweather.js';
 
 describe('openweather-uv', function () {
   /** UVRequest Class tests */

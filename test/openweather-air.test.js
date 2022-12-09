@@ -1,8 +1,7 @@
-const url = require('url');
-const nock = require('nock');
-const assert = require('assert');
-const air = require('../src/openweather').air;
-const InvalidRequestType = require('../src/openweather').InvalidRequestType;
+import url from 'node:url';
+import assert from 'node:assert';
+import nock from 'nock';
+import { air, InvalidRequestType } from '../src/openweather.js';
 
 describe('openweather-air', function () {
   /** AirRequest Class tests */

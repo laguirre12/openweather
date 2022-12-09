@@ -4,19 +4,7 @@
  * @module openweather
  * @author laguirre <aguirreluis1234@gmail.com>
  */
-const uv = require('./openweather-uv');
-const air = require('./openweather-air');
-const weather = require('./openweather-weather');
-const InvalidRequestType = require('./openweather-base').InvalidRequestType;
-
-
-//--------------------------------------------------------------------
-// Exports
-//--------------------------------------------------------------------
-
-module.exports = {
-  uv: uv,
-  air: air,
-  weather: weather,
-  InvalidRequestType: InvalidRequestType
-};
+export * as uv from './openweather-uv.js';
+export * as air from './openweather-air.js';
+export * as weather from './openweather-weather.js';
+export * from './openweather-base.js';

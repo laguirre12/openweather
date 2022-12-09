@@ -11,9 +11,9 @@
  * const weather = require('openweather').weather;
  */
 
-const got = require('got');
-const url = require('url');
-const InvalidRequestType = require('./openweather-base').InvalidRequestType;
+import got from 'got';
+import url from 'node:url';
+import { InvalidRequestType } from './openweather-base.js';
 
 let APPID; // global references to API_KEY
 
@@ -33,7 +33,7 @@ let APPID; // global references to API_KEY
  * @property {function(string)} getName a function to retrieve string names of
  * units
  */
-const TemperatureUnit = Object.freeze({
+export const TemperatureUnit = Object.freeze({
   METRIC: Symbol('metric'),
   STANDARD: Symbol('standard'),  // kelvin
   IMPERIAL: Symbol('imperial'),
@@ -161,7 +161,7 @@ Object.freeze(baseUrl);
  * // NOTE: you only need one of: city id, city name & country, zip & country,
  * // or geo. coordinates for the request
  */
-class WeatherRequest {
+export class WeatherRequest {
   /**
    * Constructs a WeatherRequest object, takes a configuration object to
    * specify default properties of the request. The properties used in the
@@ -397,7 +397,7 @@ function defaultKey(appid) {
  * WeatherRequest will have 'forecast5' WeatherRequestType.
  * @returns {WeatherRequest} A generic request for the forecast5 API
  */
-function forecast5() {
+export function forecast5() {
   return new WeatherRequest().type(WeatherRequestType.FORECAST_5);
 }
 
@@ -406,7 +406,7 @@ function forecast5() {
  * WeatherRequest will have 'forecast16' WeatherRequestType.
  * @returns {WeatherRequest} A generic request for the forecast16 API
  */
-function forecast16() {
+export function forecast16() {
   return new WeatherRequest().type(WeatherRequestType.FORECAST_16);
 }
 
@@ -415,22 +415,6 @@ function forecast16() {
  * WeatherRequest will have the 'current' WeatherRequestType.
  * @returns {WeatherRequest} A generic request for the current weather API
  */
-function current() {
+export function current() {
   return new WeatherRequest().type(WeatherRequestType.CURRENT);
 }
-
-
-//--------------------------------------------------------------------
-// Exports
-//--------------------------------------------------------------------
-
-module.exports = {
-  current: current,
-  forecast5: forecast5,
-  forecast16: forecast16,
-  defaultKey: defaultKey,
-
-  WeatherRequest: WeatherRequest,
-  TemperatureUnit: TemperatureUnit,
-  WeatherRequestType: WeatherRequestType,
-};
