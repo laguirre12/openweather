@@ -1,11 +1,16 @@
 {
   "name": "openweather",
   "version": "1.0.0",
+  "type": "module",
   "description": "A set of modules for interacting with various OpenWeatherMap API's",
-  "main": "src/openweather.js",
+  "exports": "src/openweather.js",
+  "engines" : {
+    "node": ">=14.16"
+  },
   "scripts": {
     "doc": "jsdoc src --configure .jsdoc.json --verbose",
     "lint": "eslint src test",
+    "lint-fix": "eslint src test --fix",
     "clean": "rm -rdf node_modules/ docs/ npm-debug.log",
     "test": "mocha"
   },
