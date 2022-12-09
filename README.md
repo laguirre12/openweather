@@ -40,33 +40,36 @@ Overview of each file:
 * `openweather-weather.js`: A module for interacting with the [Openweather Current Weather API](https://openweathermap.org/current), [OpenWeather 5 day/3 hour Forecast API](https://openweathermap.org/forecast5), and the [OpenWeather 16 day Forecast API](https://openweathermap.org/forecast16). These three API's are grouped together because they have similar request parameters. The module consists of a `WeatherRequest` class, `WeatherRequestType`'s to specify which endpoint is called, and factory functions to create new `WeatherRequest`'s.
 
 ## OpenWeather-uv
-    const uv = require('openweather').uv;
-    uv.defaultKey('<API-KEY>');
 
-    const req = uv.current()
-                  .coords(101.133, 55.166);
+```javascript
+import { uv }  from 'openweather';
+uv.defaultKey('<API-KEY>');
 
-    console.log(req.appid());   // '<API-KEY>'
-    console.log(req.coords());  // '{ lat: 101.133, lon: 55.166 }'
-    console.log(req.url());     // string URL associated with the API request
+const req = uv.current()
+              .coords(101.133, 55.166);
 
-    // execute the request using a Promise
-    req.exec()
-      .then(data => {
-        console.log(data);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+console.log(req.appid());   // '<API-KEY>'
+console.log(req.coords());  // '{ lat: 101.133, lon: 55.166 }'
+console.log(req.url());     // string URL associated with the API request
 
-    // or with a callback
-    req.exec(function (err, data) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log(data);
-    });
+// execute the request using a Promise
+req.exec()
+  .then(data => {
+    console.log(data);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+
+// or with a callback
+req.exec(function (err, data) {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log(data);
+});
+```
 
 #### UVRequest methods:
 
@@ -101,27 +104,29 @@ Overview of each file:
 
 
 ## Openweather-air
-    const air = require('openweather').air;
-    air.defaultKey('<API-KEY>');
+```javascript
+import { air } from 'openweather';
+air.defaultKey('<API-KEY>');
 
-    // a request to the Air pollution data API for the ozone endpoint
-    const req = air.ozone()
-                   .appid('<ANOTHER-API-KEY>') // override default key
-                   .coords(101.133, 55.166)
-                   .datetime(new Date());
+// a request to the Air pollution data API for the ozone endpoint
+const req = air.ozone()
+               .appid('<ANOTHER-API-KEY>') // override default key
+               .coords(101.133, 55.166)
+               .datetime(new Date());
 
-    console.log(req.appid());  // '<ANOTHER-API-KEY>'
-    console.log(req.coords()); // '{ lat: 101.133, lon: 55.166 }'
-    console.log(req.url());    // string URL associated with the API request
+console.log(req.appid());  // '<ANOTHER-API-KEY>'
+console.log(req.coords()); // '{ lat: 101.133, lon: 55.166 }'
+console.log(req.url());    // string URL associated with the API request
 
-    // sends the request
-    req.exec()
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+// sends the request
+req.exec()
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
 
 #### AirRequest methods:
 
@@ -154,29 +159,30 @@ Overview of each file:
 | defaultKey      | appid  | sets a default API-KEY for all AirRequest's |
 
 
-
-
 ## Openweather-weather
-    const weather = require('openweather').weather;
-    weather.defaultKey('<API-KEY>');
 
-    // a request to the free Weather Forecast with the default API key
-    const req = weather.current()
-                       .city('Austin')
-                       .units(weather.TemperatureUnit.METRIC); // for celsius
+```javascript
+import { weather } from 'openweather';
+weather.defaultKey('<API-KEY>');
 
-    console.log(req.appid());  // '<API-KEY>'
-    console.log(req.city());   // '{ city: 'Austin', country: undefined }'
-    console.log(req.url());    // the string URL corresponding to the API request
+// a request to the free Weather Forecast with the default API key
+const req = weather.current()
+                   .city('Austin')
+                   .units(weather.TemperatureUnit.METRIC); // for celsius
 
-    // sends the request
-    req.exec()
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+console.log(req.appid());  // '<API-KEY>'
+console.log(req.city());   // '{ city: 'Austin', country: undefined }'
+console.log(req.url());    // the string URL corresponding to the API request
+
+// sends the request
+req.exec()
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
 
 #### WeatherRequest methods:
 
