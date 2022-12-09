@@ -226,7 +226,6 @@ export class AirRequest {
   exec(callback) {
     const url = this.url();
     callback = callback || (() => {});
-
     return new Promise(function (resolve, reject) {
       got(url, { json : true, allowGetBody : true }).json()
         .then(res => {

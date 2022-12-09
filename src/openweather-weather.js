@@ -74,7 +74,7 @@ export const TemperatureUnit = Object.freeze({
  * @property {function(WeatherRequestType)} getName retrieves the string name
  * of the RequestType
  */
-const WeatherRequestType = Object.freeze({
+export const WeatherRequestType = Object.freeze({
   CURRENT: Symbol('current'),
   FORECAST_5: Symbol('forecastDay'),
   FORECAST_16: Symbol('forecastHour'),
@@ -364,10 +364,10 @@ export class WeatherRequest {
     const url = this.url();
     callback = callback || (() => {});
     return new Promise(function (resolve, reject) {
-      got(url, { json : true })
+      got(url, { json : true, allowGetBody : true }).json()
         .then(res => {
-          resolve(res.body);
-          callback(null, res.body);
+          resolve(res);
+          callback(null, res);
         })
         .catch(err => {
           reject(err);
@@ -387,7 +387,7 @@ export class WeatherRequest {
  * @param {string} appid Default API key
  * @returns {string} The current default API KEY
  */
-function defaultKey(appid) {
+export function defaultKey(appid) {
   if (arguments.length) APPID = appid;
   return APPID;
 }

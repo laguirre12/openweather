@@ -245,10 +245,10 @@ export class UVRequest {
     const url = this.url();
     callback = callback || (() => {});
     return new Promise(function (resolve, reject) {
-      got(url, { json : true })
+      got(url, { json : true, allowGetBody : true }).json()
         .then(res => {
-          resolve(res.body);
-          callback(null, res.body);
+          resolve(res);
+          callback(null, res);
         })
         .catch(err => {
           reject(err);
