@@ -4,7 +4,7 @@
   "type": "module",
   "description": "A set of modules for interacting with various OpenWeatherMap API's",
   "exports": "src/openweather.js",
-  "engines" : {
+  "engines": {
     "node": ">=14.16"
   },
   "scripts": {
@@ -26,7 +26,7 @@
     "jsdoc": "^3.6.3",
     "jsdoc-template": "git+https://git@github.com/braintree/jsdoc-template.git",
     "mocha": "^7.1.2",
-    "nock": "^9.6.1"
+    "nock": "^13.2.9"
   },
   "keywords": [
     "weather",
