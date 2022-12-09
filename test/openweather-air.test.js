@@ -85,7 +85,7 @@ describe('openweather-air', function () {
 
     describe('#datetime()', function () {
       const datetime = '2016-01-02T15:04:05Z';
-      it('should set the tiem', function () {
+      it('should set the time', function () {
         const req = (new air.AirRequest()).datetime(datetime);
         assert.strictEqual(req.datetime(), datetime);
       });

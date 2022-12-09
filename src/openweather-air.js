@@ -221,16 +221,17 @@ export class AirRequest {
    * Executes the API request.
    * @param {function(err, res)} [callback] a callback function that is called
    * with a possible error and the API response
-   * @returns {Promise} A promise representing the result of the request
+   * @returns {Promise} A promise representing the JSON object
    */
   exec(callback) {
     const url = this.url();
     callback = callback || (() => {});
+
     return new Promise(function (resolve, reject) {
-      got(url, { json : true })
+      got(url, { json : true, allowGetBody : true }).json()
         .then(res => {
-          resolve(res.body);
-          callback(null, res.body);
+          resolve(res)
+          callback(null, res);
         })
         .catch(err => {
           reject(err);
@@ -249,7 +250,7 @@ export class AirRequest {
  * @param {string} appid Default API key
  * @returns {string} The current default API KEY
  */
-function defaultKey(appid) {
+export function defaultKey(appid) {
   if (arguments.length) APPID = appid;
   return APPID;
 }
