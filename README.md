@@ -1,5 +1,6 @@
 # OpenWeather
 
+
 [Install](#install)<br/>
 [NPM Scripts](#npm-scripts)<br/>
 [Overview](#overview)<br/>
@@ -17,9 +18,9 @@ npm install github:laguirre12/openweather
 For more information on installing a dependency directly from a github repo, refer to the [NPM Install documentation](https://docs.npmjs.com/cli/install).
 
 ## NPM Scripts
-* `doc`: creates the documentation pages found
+
+* `doc`: generate HTML API documentation
 * `lint`: runs ESLint on the source code
-* `clean`: removes the node\_modules and docs directory
 * `test`: runs the test suite
 
 ## Overview
@@ -27,7 +28,7 @@ This is a set of modules meant to interact with various OpenWeather APIs. Each m
 
 As of now, these modules only allow for the response format to be in JSON, and all modules are bundled together into a single import `openweather` (refer to code examples for more detail).
 
-Overview of each file:
+Overview of each module:
 
 * `openweather.js`: A module that wraps the other openweather modules into one.
 
@@ -38,6 +39,10 @@ Overview of each file:
 * `openweather-air.js`: A module for solely interacting with the [OpenWeather Air pollution API](https://openweathermap.org/api/pollution/co). The module consists of an `AirRequest` class, `AirRequestType`'s to specify which endpoint is called, and factory functions to create new `AirRequest`'s.
 
 * `openweather-weather.js`: A module for interacting with the [Openweather Current Weather API](https://openweathermap.org/current), [OpenWeather 5 day/3 hour Forecast API](https://openweathermap.org/forecast5), and the [OpenWeather 16 day Forecast API](https://openweathermap.org/forecast16). These three API's are grouped together because they have similar request parameters. The module consists of a `WeatherRequest` class, `WeatherRequestType`'s to specify which endpoint is called, and factory functions to create new `WeatherRequest`'s.
+
+For more information, refer to generated the API documentation.
+
+![API Documentation](../docs/openweather-doc.png)
 
 ## OpenWeather-uv
 
