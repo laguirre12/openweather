@@ -3,6 +3,8 @@ import assert from 'node:assert';
 import nock from 'nock';
 import { air, InvalidRequestType } from '../src/openweather.js';
 
+const SUCCESS_RESPONSE = 200;
+
 describe('openweather-air', function () {
   /** AirRequest Class tests */
   describe('#AirRequest', function () {
@@ -142,7 +144,7 @@ describe('openweather-air', function () {
           nock('http://api.openweathermap.org')
             .get(`/pollution/v1/${name}/${params.lat},${params.lon}/${params.datetime}.json`)
             .query({ appid : params.appid })
-            .reply(200, returnValue);
+            .reply(SUCCESS_RESPONSE, returnValue);
 
           const req = (new air.AirRequest())
             .type(e)

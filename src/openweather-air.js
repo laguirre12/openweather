@@ -229,7 +229,7 @@ export class AirRequest {
     return new Promise(function (resolve, reject) {
       got(url, { json : true, allowGetBody : true }).json()
         .then(res => {
-          resolve(res)
+          resolve(res);
           callback(null, res);
         })
         .catch(err => {

@@ -3,6 +3,7 @@ import assert from 'node:assert';
 import nock from 'nock';
 import { weather, InvalidRequestType } from '../src/openweather.js';
 
+const SUCCESS_RESPONSE = 200;
 
 describe('openweather-weather', function () {
   /** Test WeatherRequest class */
@@ -259,7 +260,7 @@ describe('openweather-weather', function () {
         nock('http://api.openweathermap.org')
           .get('/data/2.5/weather')
           .query(params)
-          .reply(200, returnValue);
+          .reply(SUCCESS_RESPONSE, returnValue);
 
         const req = weather.current()
           .city('Austin')
@@ -284,7 +285,7 @@ describe('openweather-weather', function () {
         nock('http://api.openweathermap.org')
           .get('/data/2.5/forecast')
           .query(params)
-          .reply(200, returnValue);
+          .reply(SUCCESS_RESPONSE, returnValue);
         const req = (new weather.WeatherRequest())
           .type(weather.WeatherRequestType.FORECAST_5)
           .appid(params.APPID)
@@ -309,7 +310,7 @@ describe('openweather-weather', function () {
         nock('http://api.openweathermap.org')
           .get('/data/2.5/forecast/daily')
           .query(params)
-          .reply(200, returnValue);
+          .reply(SUCCESS_RESPONSE, returnValue);
         const req = (new weather.WeatherRequest())
           .type(weather.WeatherRequestType.FORECAST_16)
           .id(params.id)
