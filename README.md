@@ -1,12 +1,32 @@
 # OpenWeather
 
+## TODOs
+* [ ] [Openwewather UV](https://openweathermap.org/api/uvi) has been deprecated in favor of [One Call API 3.0](https://openweathermap.org/api/one-call-3)
+* [ ] [Openweather AIR](https://openweathermap.org/api/air-pollution) seems to have the wrong API endpoint (possibly
+    wrong parameters). The code seems to use `http://api.openweathermap.org/pollution/v1/`, but the documentaiton has
+    `http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={API key}`
+* [ ] [Weather APIs](https://openweathermap.org/api), weather apis should be fine but need to create an integration test
+    script
 
-[Install](#install)<br/>
-[NPM Scripts](#npm-scripts)<br/>
-[Overview](#overview)<br/>
-[OpenWeather-UV](#openweather\-uv)<br/>
-[OpenWeather-Air](#openweather\-air)<br/>
-[OpenWeather-Weather](#openweather\-weather)
+<!-- vim-markdown-toc GFM -->
+
+* [Install](#install)
+* [NPM Scripts](#npm-scripts)
+* [Overview](#overview)
+* [OpenWeather-uv](#openweather-uv)
+    * [UVRequest methods:](#uvrequest-methods)
+    * [UVRequestType's:](#uvrequesttypes)
+    * [Other Openweather-uv functions:](#other-openweather-uv-functions)
+* [Openweather-air](#openweather-air)
+    * [AirRequest methods:](#airrequest-methods)
+    * [AirRequestType's:](#airrequesttypes)
+    * [Other Openweather-air functions:](#other-openweather-air-functions)
+* [Openweather-weather](#openweather-weather)
+    * [WeatherRequest methods:](#weatherrequest-methods)
+    * [WeatherRequestType's:](#weatherrequesttypes)
+    * [Other Openweather-weather functions:](#other-openweather-weather-functions)
+
+<!-- vim-markdown-toc -->
 
 ## Install
 Install this project directly from this repository with npm by running one of the following commands:
