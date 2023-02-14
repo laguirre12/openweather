@@ -1,8 +1,9 @@
-const url = require('url');
-const nock = require('nock');
-const assert = require('assert');
-const uv = require('../src/openweather').uv;
-const InvalidRequestType = require('../src/openweather').InvalidRequestType;
+import url from 'node:url';
+import assert from 'node:assert';
+import nock from 'nock';
+import { uv, InvalidRequestType } from '../src/openweather.js';
+
+const SUCCESS_RESPONSE = 200;
 
 describe('openweather-uv', function () {
   /** UVRequest Class tests */
@@ -115,7 +116,7 @@ describe('openweather-uv', function () {
     describe('#limit()', function () {
       it('should set a limit on the number of days in the forecast', function () {
         const limitValue = 3;
-        const req = uv.forecast().limit(3);
+        const req = uv.forecast().limit(limitValue);
         req.limit(limitValue);   // limit should only be set for FORECAST type
         assert.strictEqual(req.limit(), limitValue);
       });
@@ -210,7 +211,7 @@ describe('openweather-uv', function () {
         nock('http://api.openweathermap.org')
           .get('/data/2.5/uvi')
           .query(true)
-          .reply(200, returnValue);
+          .reply(SUCCESS_RESPONSE, returnValue);
         const req = (new uv.UVRequest())
           .type(uv.UVRequestType.CURRENT)
           .appid(params.appid)
@@ -224,7 +225,7 @@ describe('openweather-uv', function () {
         nock('http://api.openweathermap.org')
           .get('/data/2.5/uvi/forecast')
           .query(true)
-          .reply(200, returnValue);
+          .reply(SUCCESS_RESPONSE, returnValue);
         const req = (new uv.UVRequest())
           .type(uv.UVRequestType.FORECAST)
           .appid(params.appid)
@@ -239,7 +240,7 @@ describe('openweather-uv', function () {
         nock('http://api.openweathermap.org')
           .get('/data/2.5/uvi/history')
           .query(true)
-          .reply(200, returnValue);
+          .reply(SUCCESS_RESPONSE, returnValue);
         const req = (new uv.UVRequest())
           .type(uv.UVRequestType.HISTORY)
           .appid(params.appid)

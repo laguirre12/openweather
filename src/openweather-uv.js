@@ -5,12 +5,12 @@
  * @author laguirre <aguirreluis1234@gmail.com>
  * @example
  * // require the openweather-uv module
- * const uv = require('openweather').uv;
+ * import { uv } from 'openweather';
  */
 
-const got = require('got');
-const url = require('url');
-const InvalidRequestType = require('./openweather-base').InvalidRequestType;
+import got from 'got';
+import url from 'node:url';
+import { InvalidRequestType } from './openweather-base.js';
 
 let APPID; // global reference to API_KEY
 
@@ -29,7 +29,7 @@ let APPID; // global reference to API_KEY
  * @property {symbol(string)} HISTORY history UV index endpoint ({@link https://openweathermap.org/api/uvi#forecast})
  * @property {symbol(string)} FORECAST forecast UV index endpoint ({@link https://openweathermap.org/api/uvi#history})
  */
-const UVRequestType = Object.freeze({
+export const UVRequestType = Object.freeze({
   CURRENT: Symbol('current'),
   HISTORY: Symbol('history'),
   FORECAST: Symbol('forecast'),
@@ -113,7 +113,7 @@ Object.freeze(baseUrl);
  *   end: '1498481991'
  * });
  */
-class UVRequest {
+export class UVRequest {
   /**
    * Constructs a UVRequest object, takes an optional configuration
    * object to specify default properties of the request. The properties used
@@ -245,10 +245,10 @@ class UVRequest {
     const url = this.url();
     callback = callback || (() => {});
     return new Promise(function (resolve, reject) {
-      got(url, { json : true })
+      got(url, { json : true, allowGetBody : true }).json()
         .then(res => {
-          resolve(res.body);
-          callback(null, res.body);
+          resolve(res);
+          callback(null, res);
         })
         .catch(err => {
           reject(err);
@@ -267,7 +267,7 @@ class UVRequest {
  * @param {string} appid Default API key
  * @returns {string} The current default API KEY
  */
-function defaultKey(appid) {
+export function defaultKey(appid) {
   if (arguments.length) APPID = appid;
   return APPID;
 }
@@ -278,7 +278,7 @@ function defaultKey(appid) {
  * UVRequestType of 'current'.
  * @returns {UVRequest} A new UVRequest of type CURRENT
  */
-function current() {
+export function current() {
   return new UVRequest().type(UVRequestType.CURRENT);
 }
 
@@ -287,7 +287,7 @@ function current() {
  * UVRequestTYpe of 'history'.
  * @returns {UVRequest} A new UVRequest
  */
-function history() {
+export function history() {
   return new UVRequest().type(UVRequestType.HISTORY);
 }
 
@@ -296,20 +296,6 @@ function history() {
  * UVRequestType of 'forecast'.
  * @returns {UVRequest} A new UVRequest
  */
-function forecast() {
+export function forecast() {
   return new UVRequest().type(UVRequestType.FORECAST);
 }
-
-//--------------------------------------------------------------------
-// Exports
-//--------------------------------------------------------------------
-
-module.exports = {
-  current: current,
-  history: history,
-  forecast: forecast,
-  defaultKey: defaultKey,
-
-  UVRequest: UVRequest,
-  UVRequestType: UVRequestType
-};

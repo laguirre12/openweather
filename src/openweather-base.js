@@ -84,13 +84,10 @@
  * constructor modifies the stack trace to remove the call to this error's
  * constructor.
  */
-class InvalidRequestType extends TypeError {
+export class InvalidRequestType extends TypeError {
   constructor(...args) {
     super(...args);
     Error.captureStackTrace(this, InvalidRequestType);
   }
 }
 
-module.exports = {
-  InvalidRequestType: InvalidRequestType,
-};

@@ -12,9 +12,7 @@ module.exports = {
   ],
 
   "parserOptions": {
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true,
-    },
+    "ecmaVersion": "latest",
     "sourceType": "module"
   },
 
@@ -52,7 +50,7 @@ module.exports = {
     }],
 
     "max-len": ["warn", {          // max line-length of 80, ignore for urls,
-        "code": 80,                // strings, and template-literals
+        "code": 120,                // strings, and template-literals
         "tabWidth": 2,
         "ignoreUrls": true,
         "ignoreStrings": true,
